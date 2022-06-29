@@ -152,7 +152,7 @@ static void PKCS7_Padding(u8 *InOutBuf, u64 *Inoutlen, u16 Blocksize)
 }
 
 // 密钥生成函数
-static u8 **Round_key_obfuscation(u8 *key, u8 n, )
+static u8 **Round_key_obfuscation(u8 *key, u8 n)
 {
     return NULL;
 }

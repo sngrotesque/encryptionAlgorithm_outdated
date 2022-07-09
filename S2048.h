@@ -14,23 +14,23 @@ typedef uint32_t u32;
 typedef uint64_t u64;
 
 #define BLOCK_SIZE        256  // 256 Bytes
-#define PADDING_DATA      0x70  // 填充值 0xb3
-#define NUMBER_OF_ROUNDS  14   // 加密解密轮数
+#define PADDING_DATA      0x70 // 填充值 0xb3
+#define NUMBER_OF_ROUNDS  7    // 加密解密轮数
 
 #define BIN_R(x) (x ^ 0xFF)
 
-typedef struct {
-    u8 *data;  // 数据
-    u8 *token;   // 密码
-    u64 len;   // 数据长度
-} sn;
+struct S2048_ctx {
+    u8 *data;
+    u8 *token;
+    u64 len;
+};
 
 // 初始混淆值 (可自定义)
 const static u8 sbox[256] = {
-    0x80, 0xC0, 0x1F, 0xC0, 0x8B, 0xA8, 0x77, 0xB9,
-    0x69, 0xD1, 0x3C, 0x52, 0xC9, 0xDB, 0x5D, 0x32,
-    0xF0, 0x8C, 0xA1, 0x23, 0xDE, 0x3E, 0xE7, 0x68,
-    0x68, 0xDE, 0xA2, 0x6D, 0x88, 0x63, 0x2A, 0x8C,
+    0xC0, 0xC0, 0x1F, 0xC0, 0x8B, 0xA8, 0x77, 0xB9,
+    0x79, 0xD1, 0x3C, 0x52, 0xC9, 0xDB, 0x5D, 0x32,
+    0xF2, 0x8C, 0xA1, 0x23, 0xDE, 0x3E, 0xE7, 0x68,
+    0x68, 0xDA, 0xA2, 0x6D, 0x88, 0x63, 0x2A, 0x8C,
     0xE3, 0x9E, 0x5B, 0x9F, 0x5E, 0xA5, 0x79, 0x60,
     0x4C, 0x6E, 0xC7, 0x61, 0x23, 0xB6, 0x72, 0xE2,
     0x8D, 0x5D, 0x71, 0xDC, 0x49, 0x71, 0xD8, 0x9B,
@@ -65,7 +65,7 @@ const static u8 sbox[256] = {
 #ifndef __SN_FUNCTION__
 #define __SN_FUNCTION__ 1
 
-static void S2048_Padding(sn *data)
+static void S2048_Padding(struct S2048_ctx *data)
 {
 	u64 padoffset = BLOCK_SIZE - data->len % BLOCK_SIZE;
     u64 padding_n = data->len + padoffset;
@@ -82,6 +82,18 @@ static void S2048_Padding(sn *data)
         data->data[padding_n - 1] = padoffset;
     }
     data->len = padding_n;
+}
+
+static void S2048_Key_Padding(struct S2048_ctx *data)
+{
+    size_t key_n = strlen((char *)data->token);
+    u8 *temp = (u8 *)malloc(BLOCK_SIZE + 1);
+    memcpy(temp, data->token, key_n);
+    temp[BLOCK_SIZE] = 0x00;
+    for(u32 x = key_n, index = 0; x < 256; ++x, ++index) {
+        if(index == key_n) index = 0;
+        temp[x] = data->token[index];
+    } data->token = temp;
 }
 
 // 密钥生成函数
@@ -108,7 +120,7 @@ static u8 **Round_key_obfuscation(u8 *master_key)
 }
 
 // 加密函数
-static int S2048_ENCRYPT(sn *data)
+static int S2048_ENCRYPT(struct S2048_ctx *data)
 {
     u8 **key = Round_key_obfuscation(data->token);
     u8 keyindex; u64 rounds, x;
@@ -121,7 +133,7 @@ static int S2048_ENCRYPT(sn *data)
 }
 
 // 解密函数
-static int S2048_DECRYPT(sn *data)
+static int S2048_DECRYPT(struct S2048_ctx *data)
 {
     return 0;
 }

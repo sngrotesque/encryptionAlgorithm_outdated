@@ -31,37 +31,28 @@ static uint8_t *file_read(FILE *stream)
     } return data;
 }
 
-int main(int argc, char **argv)
+static void PRINT(struct S2048_ctx *data)
 {
-    sn *data = (sn *)malloc(sizeof(sn));
-
-    char temp[4096] = {
-        "0000000000000000000000000000000000000000000000000000000000000000"
-        "0000000000000000000000000000000000000000000000000000000000000000"
-        "0000000000000000000000000000000000000000000000000000000000000000"
-        "0000000000000000000000000000000000000000000000000000000000000000"
-    };
-    char key_temp[257] = {
-        "----------------------------------------------------------------"
-        "----------------------------------------------------------------"
-        "----------------------------------------------------------------"
-        "----------------------------------------------------------------"
-    };
-    data->data = (u8 *)temp;
-    data->len = strlen(temp);
-    data->token = (u8 *)key_temp;
-
-    S2048_Padding(data);
-    S2048_ENCRYPT(data);
-
     for(int x = 0;x < data->len; ++x) {
-        printf("%02X", data->data[x]);
-        if((x+1) % 16 == 0) {
+        printf("%02x", data->data[x]);
+        if((x+1) % 32 == 0) {
             printf("\n");
         } else {
-            printf(" ");
+            printf("  ");
         }
     }
+}
 
+int main(int argc, char **argv)
+{
+    FILE *fp = fopen("./LICENCE", "rb");
+	u8 data[1025] = {0};
+
+	while(!feof(fp)) {
+		fread(data, 1, 1024, fp);
+		printf("%s", data);
+	}
+
+	fclose(fp);
     return 0;
 }

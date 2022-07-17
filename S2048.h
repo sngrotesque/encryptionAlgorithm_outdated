@@ -98,7 +98,7 @@ const static u8 sbox[256] = {
 */
 static void S2048_Padding(struct S2048_ctx *data)
 {
-	u64 padoffset = BLOCK_SIZE - data->len % BLOCK_SIZE;
+    u64 padoffset = BLOCK_SIZE - data->len % BLOCK_SIZE;
     u64 padding_n = data->len + padoffset;
     u8 *temp = (u8 *)malloc(padding_n + 1);
     memcpy(temp, data->data, data->len);

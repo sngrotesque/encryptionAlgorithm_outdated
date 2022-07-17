@@ -46,11 +46,19 @@ static void PRINT(struct S2048_ctx *data)
 int main(int argc, char **argv)
 {
     FILE *fp = fopen("./LICENCE", "rb");
-	u8 data[1025] = {0};
+
+	char key[256] = {"https://sngrotesque.com/downloads/hello_world.txt"};
+
+	struct S2048_ctx *data = (struct S2048_ctx *)malloc(sizeof(struct S2048_ctx));
+	data->data = (u8 *)malloc(1025);
+	data->len = 1024;
+	data->token = (u8 *)key;
+
+	S2048_Padding(data);
+	S2048_Key_Padding(data);
 
 	while(!feof(fp)) {
 		fread(data, 1, 1024, fp);
-		printf("%s", data);
 	}
 
 	fclose(fp);

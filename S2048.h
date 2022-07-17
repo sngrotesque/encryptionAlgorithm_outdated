@@ -1,4 +1,16 @@
-#include <time.h>
+/*
+* W: 在开始之前，请确保你具有阅读此源代码的能力。
+* 
+* P.S: 此文档存在的目的是让使用此算法的人更好的理解它的工作原理。
+* 
+* 1. 每个区块的长度为2048位，就如目前市面上绝大多数的256位的加密算法。
+* 2. 默认情况下的填充值为一个0-255区间的十六进制值。
+* 3. 默认情况下的加密次数为7次。
+* 
+* 接下来请阅读每个函数的详细注释。
+*/
+
+// #include <time.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -8,24 +20,28 @@
 #ifndef __SN_OBJECT__
 #define __SN_OBJECT__ 1
 
+// * 简化代码量 * //
 typedef uint8_t  u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
 
+// * 初始的宏定义 * //
 #define BLOCK_SIZE        256  // 256 Bytes
-#define PADDING_DATA      0x70 // 填充值 0xb3
+#define PADDING_DATA      112  // 填充值 0x70
 #define NUMBER_OF_ROUNDS  7    // 加密解密轮数
 
+// * 用在加密与解密函数中的初始宏定义函数 * //
 #define BIN_R(x) (x ^ 0xFF)
 
+// * 基本的变量 * //
 struct S2048_ctx {
-    u8 *data;
-    u8 *token;
-    u64 len;
+    u8 *data;   // 用于加密或解密的数据
+    u8 *token;  // 用于加密解密的口令，你可以理解为密钥
+    u64 len;    // 数据的字节长度
 };
 
-// 初始混淆值 (可自定义)
+// * 初始混淆值（用于打乱密钥的值 (可自定义)） * //
 const static u8 sbox[256] = {
     0xC0, 0xC0, 0x1F, 0xC0, 0x8B, 0xA8, 0x77, 0xB9,
     0x79, 0xD1, 0x3C, 0x52, 0xC9, 0xDB, 0x5D, 0x32,
@@ -65,6 +81,21 @@ const static u8 sbox[256] = {
 #ifndef __SN_FUNCTION__
 #define __SN_FUNCTION__ 1
 
+/*
+* 用于将数据填充为256字节长度倍数的函数。
+* 
+* 1. 如果数据的字节长度并非为256的倍数，此函数将填充其至256的倍数。
+*    如一段数据长度为121，那么此函数会将其填充至256字节。
+*    其中，填充值为宏定义中的'PADDING_DATA'
+*    而最后一字节的数据则为填充长度，此示例中为0x87。
+* 
+* 2. 如果数据字节长度原本就为256的倍数，此函数将填充256字节的数据。
+*    但与第一种情况不同的是，最后两字节的数据会同时为0xff。
+*
+* 也就是说：
+*    第一种填充方式的最后一字节为校验位
+*    第二种填充方式的最后两字节为校验位
+*/
 static void S2048_Padding(struct S2048_ctx *data)
 {
 	u64 padoffset = BLOCK_SIZE - data->len % BLOCK_SIZE;
@@ -84,6 +115,15 @@ static void S2048_Padding(struct S2048_ctx *data)
     data->len = padding_n;
 }
 
+/*
+* 用于将密钥填充为256字节长度倍数的函数。
+* 
+* 1. 如果密钥长度小于256，此函数会用其自身数据进行填充直到256字节长度。
+*    如一个密钥为"123-456-789-0"，那么它会被填充为如下样式：
+*    123-456-789-0123-456-789-0123-456-789-0123-456-789-0 ...
+*
+* 2. 如果密钥长度大于256，此函数不会修改任何内容。
+*/
 static void S2048_Key_Padding(struct S2048_ctx *data)
 {
     size_t key_n = strlen((char *)data->token);
@@ -96,7 +136,9 @@ static void S2048_Key_Padding(struct S2048_ctx *data)
     } data->token = temp;
 }
 
-// 密钥生成函数
+/*
+* 密钥更新函数，我困了，下次再来写。
+*/
 static u8 **Round_key_obfuscation(u8 *master_key)
 {
     u8 **key_set = (u8 **)malloc(NUMBER_OF_ROUNDS * 8);
@@ -105,10 +147,9 @@ static u8 **Round_key_obfuscation(u8 *master_key)
         key_set[rounds] = (u8 *)malloc(BLOCK_SIZE);
         memcpy(key_set[rounds], master_key, BLOCK_SIZE);
         for(u32 x = 0; x < BLOCK_SIZE; ++x) {
-            if(x == 0) {
-                temp = key_set[rounds][x] ^ key_set[rounds][255];
-            } else {
-                temp = key_set[rounds][x] ^ key_set[rounds][x-1];
+            switch(x) {
+                case 0: temp = key_set[rounds][x] ^ key_set[rounds][255]; break;
+                default: temp = key_set[rounds][x] ^ key_set[rounds][x-1]; break;
             }
             temp = temp ^ key_set[rounds][174];
             temp = (x ^ temp - rounds) ^ sbox[x];
@@ -123,6 +164,7 @@ static u8 **Round_key_obfuscation(u8 *master_key)
 static int S2048_ENCRYPT(struct S2048_ctx *data)
 {
     u8 **key = Round_key_obfuscation(data->token);
+    if (key == NULL) {return EOF;}
     u8 keyindex; u64 rounds, x;
     for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
         for(x = keyindex = 0; x < data->len; ++x, ++keyindex) {

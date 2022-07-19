@@ -1,5 +1,7 @@
 ### Encryption algorithm written by 'SN-Grotesque'
 
+> 赞助: https://afdian.net/@sngrotesque
+
 > 当前版本: Beta v0.7
 
 ##### Beta v0.7

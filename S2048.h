@@ -20,7 +20,6 @@
 #ifndef __SN_OBJECT__
 #define __SN_OBJECT__ 1
 
-// * 简化代码量 * //
 typedef uint8_t  u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -28,18 +27,21 @@ typedef uint64_t u64;
 
 // * 初始的宏定义 * //
 #define BLOCK_SIZE        256  // 256 Bytes
-#define PADDING_DATA      112  // 填充值 0x70
+#define PADDING_DATA      199  // 填充值 0xc7
 #define NUMBER_OF_ROUNDS  7    // 加密解密轮数
+
+#define True 1
+#define False 0
 
 // * 用在加密与解密函数中的初始宏定义函数 * //
 #define BIN_R(x) (x ^ 0xFF)
 
 // * 基本的变量 * //
-struct S2048_ctx {
+typedef struct {
     u8 *data;   // 用于加密或解密的数据
     u8 *token;  // 用于加密解密的口令，你可以理解为密钥
     u64 len;    // 数据的字节长度
-};
+} S2048_ctx;
 
 // * 初始混淆值（用于打乱密钥的值 (可自定义)） * //
 const static u8 sbox[256] = {
@@ -96,7 +98,7 @@ const static u8 sbox[256] = {
 *    第一种填充方式的最后一字节为校验位
 *    第二种填充方式的最后两字节为校验位
 */
-static void S2048_Padding(struct S2048_ctx *data)
+static void S2048_Padding(S2048_ctx *data)
 {
     u64 padoffset = BLOCK_SIZE - data->len % BLOCK_SIZE;
     u64 padding_n = data->len + padoffset;
@@ -124,7 +126,7 @@ static void S2048_Padding(struct S2048_ctx *data)
 *
 * 2. 如果密钥长度大于256，此函数不会修改任何内容。
 */
-static void S2048_Key_Padding(struct S2048_ctx *data)
+static void S2048_Key_Padding(S2048_ctx *data)
 {
     size_t key_n = strlen((char *)data->token);
     u8 *temp = (u8 *)malloc(BLOCK_SIZE + 1);
@@ -161,21 +163,19 @@ static u8 **Round_key_obfuscation(u8 *master_key)
 }
 
 // 加密函数
-static int S2048_ENCRYPT(struct S2048_ctx *data)
+static int S2048_ENCRYPT(S2048_ctx *data, u8 **total_key)
 {
-    u8 **key = Round_key_obfuscation(data->token);
-    if (key == NULL) {return EOF;}
     u8 keyindex; u64 rounds, x;
     for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
         for(x = keyindex = 0; x < data->len; ++x, ++keyindex) {
-            data->data[x] = BIN_R(data->data[x] ^ key[rounds][keyindex]);
+            data->data[x] = BIN_R(data->data[x] ^ total_key[rounds][keyindex]);
         }
     }
     return 0;
 }
 
 // 解密函数
-static int S2048_DECRYPT(struct S2048_ctx *data)
+static int S2048_DECRYPT(S2048_ctx *data)
 {
     return 0;
 }

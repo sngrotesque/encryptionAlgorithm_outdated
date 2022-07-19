@@ -1,8 +1,6 @@
 ### Encryption algorithm written by 'SN-Grotesque'
 
-> 当前版本: Beta v0.6
-
-> 下一版本: Beta v0.7
+> 当前版本: Beta v0.7
 
 ##### Beta v0.7
 ```c

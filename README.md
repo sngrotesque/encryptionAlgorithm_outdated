@@ -1,6 +1,8 @@
 ### Encryption algorithm written by 'SN-Grotesque'
 
-> 赞助: https://afdian.net/@sngrotesque
+> 赞助: <br>
+> https://afdian.net/@sngrotesque<br>
+> https://sng.fanbox.cc/
 
 > 当前版本: Beta v0.7
 

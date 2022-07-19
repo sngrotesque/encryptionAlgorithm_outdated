@@ -15,7 +15,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #ifndef __SN_OBJECT__
 #define __SN_OBJECT__ 1
@@ -84,7 +83,7 @@ const static u8 sbox[256] = {
 #define __SN_FUNCTION__ 1
 
 /*
-* 用于将数据填充为256字节长度倍数的函数。
+*    用于将数据填充为256字节长度倍数的函数。
 * 
 * 1. 如果数据的字节长度并非为256的倍数，此函数将填充其至256的倍数。
 *    如一段数据长度为121，那么此函数会将其填充至256字节。
@@ -118,7 +117,7 @@ static void S2048_Padding(S2048_ctx *data)
 }
 
 /*
-* 用于将密钥填充为256字节长度倍数的函数。
+*    用于将密钥填充为256字节长度倍数的函数。
 * 
 * 1. 如果密钥长度小于256，此函数会用其自身数据进行填充直到256字节长度。
 *    如一个密钥为"123-456-789-0"，那么它会被填充为如下样式：
@@ -139,9 +138,18 @@ static void S2048_Key_Padding(S2048_ctx *data)
 }
 
 /*
-* 密钥更新函数，我困了，下次再来写。
+*    轮密钥更新函数
+*
+* 1. 使用sbox中的数据对密钥的数据进行打乱和混淆，
+*    根据算法设置的加密解密轮数来决定密钥的更新周期。
+*
+* 2. 即使去掉sbox，使用此函数同样可以让你的密钥保持安全性，
+*    即使你使用的是诸如 12345678 这样的密码构成的密钥。
+*
+* 请注意：
+*    ☆ 这一切的前提是你执行了密钥数据填充函数 ☆
 */
-static u8 **Round_key_obfuscation(u8 *master_key)
+static u8 **S2048_Round_key_obfuscation(u8 *master_key)
 {
     u8 **key_set = (u8 **)malloc(NUMBER_OF_ROUNDS * 8);
     u8 *key_temp = (u8 *)malloc(BLOCK_SIZE), temp;
@@ -154,7 +162,7 @@ static u8 **Round_key_obfuscation(u8 *master_key)
                 default: temp = key_set[rounds][x] ^ key_set[rounds][x-1]; break;
             }
             temp = temp ^ key_set[rounds][174];
-            temp = (x ^ temp - rounds) ^ sbox[x];
+            temp = ((x ^ temp) - rounds) ^ sbox[x];
             key_temp[x] = BIN_R(temp);
         }
         master_key = key_temp;
@@ -162,7 +170,12 @@ static u8 **Round_key_obfuscation(u8 *master_key)
     return key_set;
 }
 
-// 加密函数
+/*
+* 加密函数，没必要过多介绍。
+*
+* 在加密之前请使用S2048_Round_key_obfuscation函数生成新密钥，
+* 并在这之后使用新密钥与此加密函数进行运算。
+*/
 static int S2048_ENCRYPT(S2048_ctx *data, u8 **total_key)
 {
     u8 keyindex; u64 rounds, x;
@@ -174,7 +187,11 @@ static int S2048_ENCRYPT(S2048_ctx *data, u8 **total_key)
     return 0;
 }
 
-// 解密函数
+/*
+* 解密函数，没必要过多介绍。
+*
+* 请按照加密函数上的注释执行。
+*/
 static int S2048_DECRYPT(S2048_ctx *data)
 {
     return 0;

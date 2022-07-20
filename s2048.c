@@ -1,43 +1,9 @@
 #include "S2048.h"
-#include <errno.h>
-#include <math.h>
-
-static long get_file_size(FILE *stream)
-{
-    long file_size = -1;
-    long cur_offset = ftell(stream);
-    fseek(stream, 0, SEEK_END);
-    file_size = ftell(stream);
-    fseek(stream, cur_offset, SEEK_SET);
-    return file_size;
-}
-
-static uint8_t *file_read(FILE *stream)
-{
-    long len = get_file_size(stream);
-    uint8_t *data = (uint8_t *)malloc(len);
-    for(size_t x = 0; x < len; ++x) {
-        data[x] = fgetc(stream);
-    } return data;
-}
-
-static void PRINT(S2048_ctx *data)
-{
-    for(int x = 0;x < data->len; ++x) {
-        if (data->data[x] == 0x00) {
-            printf("\x1b[91m%02x\x1b[0m", data->data[x]);
-        } else {
-            printf("%02x", data->data[x]);
-        }
-        if((x+1) % 32 == 0) {printf("\n");} else {printf(" ");}
-    }
-}
-
-const static uint32_t BlockSize = 4096;
 
 int main(int argc, char **argv)
 {
     // 初始化
+    const static uint32_t BlockSize = 4096;
     if (argc != 4) {printf("./main [in_file] [out_file] [password]");return -1;}
 
     const char *load_file_name = argv[1];

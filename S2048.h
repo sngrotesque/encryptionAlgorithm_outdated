@@ -43,44 +43,32 @@ typedef struct {
 } S2048_ctx;
 
 // * 初始混淆值（用于打乱密钥的值 (可自定义)） * //
-const static u8 sbox[256] = {
-    0xC0, 0xC0, 0x1F, 0xC0, 0x8B, 0xA8, 0x77, 0xB9,
-    0x79, 0xD1, 0x3C, 0x52, 0xC9, 0xDB, 0x5D, 0x32,
-    0xF2, 0x8C, 0xA1, 0x23, 0xDE, 0x3E, 0xE7, 0x68,
-    0x68, 0xDA, 0xA2, 0x6D, 0x88, 0x63, 0x2A, 0x8C,
-    0xE3, 0x9E, 0x5B, 0x9F, 0x5E, 0xA5, 0x79, 0x60,
-    0x4C, 0x6E, 0xC7, 0x61, 0x23, 0xB6, 0x72, 0xE2,
-    0x8D, 0x5D, 0x71, 0xDC, 0x49, 0x71, 0xD8, 0x9B,
-    0x29, 0x95, 0x7F, 0xCD, 0x56, 0xB9, 0xD3, 0xA2,
-    0xE5, 0xA3, 0x24, 0x13, 0xC2, 0x52, 0x1A, 0x6D,
-    0x4D, 0x4E, 0x2B, 0x99, 0xAB, 0xEC, 0x69, 0x2D,
-    0x93, 0xDB, 0xA6, 0x1E, 0x2E, 0x9E, 0x61, 0x5E,
-    0xE5, 0x3B, 0x23, 0x3E, 0xD7, 0x90, 0xEA, 0xA7,
-    0x35, 0x92, 0xAE, 0x53, 0xB0, 0xC8, 0x42, 0x31,
-    0x3B, 0x6C, 0x1E, 0xCD, 0x6B, 0xBB, 0x8F, 0x6F,
-    0xB8, 0x32, 0x39, 0x57, 0x7E, 0x66, 0xE3, 0x4A,
-    0x32, 0xA5, 0xEE, 0x5D, 0xD5, 0x7F, 0x23, 0xC9,
-    0x9E, 0xA8, 0x5E, 0xC0, 0x33, 0xEE, 0xEA, 0x71,
-    0x4E, 0xA1, 0x26, 0x8A, 0x53, 0x76, 0xEC, 0x6B,
-    0xB3, 0x5E, 0x4D, 0x44, 0x61, 0x8F, 0x68, 0x39,
-    0xC1, 0x65, 0x46, 0x1B, 0xEE, 0xA6, 0x2A, 0x96,
-    0x43, 0xE4, 0x6A, 0xAF, 0x5A, 0xA5, 0x18, 0x94,
-    0x47, 0xCD, 0x13, 0x25, 0xAC, 0x20, 0xCB, 0xEB,
-    0x76, 0x2A, 0x6B, 0xD5, 0x44, 0xB5, 0x1F, 0xE4,
-    0x1E, 0xE4, 0x1D, 0x4D, 0x77, 0xA5, 0x7D, 0x35,
-    0x10, 0x11, 0x26, 0xAA, 0x20, 0xC3, 0x4C, 0xE0,
-    0x62, 0x81, 0x91, 0x8C, 0x73, 0x5F, 0x6A, 0x66,
-    0x8D, 0x98, 0xC1, 0x7E, 0xA5, 0x38, 0xA3, 0x25,
-    0x51, 0xC4, 0xEB, 0x18, 0x5D, 0xCB, 0x75, 0x58,
-    0xC3, 0x7F, 0x79, 0x6C, 0x46, 0xA4, 0x8E, 0xDC,
-    0x68, 0x10, 0xA5, 0xA9, 0x8B, 0x3A, 0x5C, 0xC6,
-    0xEF, 0x8E, 0x51, 0x45, 0x31, 0xB3, 0x34, 0x43,
-    0x94, 0xDE, 0xF0, 0x89, 0x29, 0xD4, 0xA9, 0xEB
+const static u8 *sbox = {
+    "\x7d\xf6\x32\x6b\xd8\xa6\x46\x7d\x73\xd0\x74\x17\xe9\x15\xcd\xc3"
+    "\x27\xd5\x2b\x2c\x57\xec\xef\x02\xea\x18\x61\x99\xcb\xa0\xc0\x98"
+    "\x81\x19\x8a\x46\xd0\x7e\xa8\xda\xa9\xf5\x67\xe6\xdc\x37\x71\xba"
+    "\xa3\xf5\xff\x2c\x4c\x85\x4b\xdb\xc4\x97\x13\xcc\x48\x50\x21\x66"
+    "\x5a\x70\x8f\x0e\xe3\x76\x70\x7c\xcc\xd5\x38\x14\x01\x61\xed\x8d"
+    "\x53\xaa\xcf\x41\xb9\x8a\xd6\x0f\x1c\xa7\xa2\x30\xba\xe5\x95\x82"
+    "\x11\x97\x6d\xdc\xa6\x6f\xcd\xf7\x9e\x5a\xb9\x0c\x60\xe2\x75\x8d"
+    "\x5b\x60\xbe\xc9\xc2\x73\x18\x5d\x99\xe3\x02\x35\x36\x1c\x8a\xa2"
+    "\x6d\xd2\xc8\x51\x69\x0b\x58\x77\x89\xc6\x42\x2a\x49\xf7\xac\x0d"
+    "\x48\x4f\x6b\xe5\xea\xdb\xea\x92\xb7\x47\x61\xfa\xa1\x7f\x6b\xf5"
+    "\x73\xd4\x68\x73\xb2\x23\x33\x78\x05\x59\x8a\x63\xe9\x29\x12\x04"
+    "\x91\xa0\xab\xd9\x5f\xbd\xb6\xbf\x51\x16\xb4\x67\x5b\x4e\x55\x18"
+    "\x48\xa1\x26\x4d\x25\x48\xfe\xad\x90\x4c\x74\xf0\x4d\xb1\x65\xcd"
+    "\xe6\xfe\x44\xc1\xc9\xf9\x54\xef\x97\x2f\x0f\xdf\x99\x7b\x1a\xe9"
+    "\x47\x05\x1f\x40\x8e\x1d\x1f\x75\xf3\x0f\x86\x50\x93\x65\xef\xd8"
+    "\x2d\xde\x28\xb1\x8c\x4c\xf5\x5f\x98\x79\x1b\x4c\x0f\x4b\x66\x9b"
 };
 #endif
 
 #ifndef __SN_FUNCTION__
 #define __SN_FUNCTION__ 1
+
+// * 在不使用填充函数的时候 * //
+// * 请确保密钥与待处理数据的字节长度一致 * //
+// * 或密钥的字节长度大于等于待处理的数据 * //
 
 /*
 *    用于将数据填充为256字节长度倍数的函数。
@@ -174,7 +162,7 @@ static u8 **S2048_Round_key_obfuscation(u8 *master_key)
 * 加密函数，没必要过多介绍。
 *
 * 在加密之前请使用S2048_Round_key_obfuscation函数生成新密钥，
-* 并在这之后使用新密钥与此加密函数进行运算。
+* 并在之后使用新密钥与此加密函数进行运算。
 */
 static int S2048_ENCRYPT(S2048_ctx *data, u8 **total_key)
 {
@@ -192,10 +180,97 @@ static int S2048_ENCRYPT(S2048_ctx *data, u8 **total_key)
 *
 * 请按照加密函数上的注释执行。
 */
-static int S2048_DECRYPT(S2048_ctx *data)
+static int S2048_DECRYPT(S2048_ctx *data, u8 **total_key)
 {
+    u8 keyindex; u64 rounds, x;
+    for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
+        for(x = keyindex = 0; x < data->len; ++x, ++keyindex) {
+            data->data[x] = BIN_R(data->data[x] ^ total_key[NUMBER_OF_ROUNDS - rounds - 1][keyindex]);
+        }
+    }
     return 0;
 }
 #endif
 
 
+
+/*
+* 这是一些我自己在调试时会使用到的函数
+* 如果你需要请保留，如果不需要请删除
+*/
+#ifndef __MISC__
+#include <errno.h>
+#include <math.h>
+
+static int64_t get_file_size(FILE *stream)
+{
+    int64_t file_size = -1;
+    int64_t cur_offset = ftello64(stream);
+    fseeko64(stream, 0, SEEK_END);
+    file_size = ftello64(stream);
+    fseeko64(stream, cur_offset, SEEK_SET);
+    return file_size;
+}
+
+static uint8_t *file_read(FILE *stream)
+{
+    int64_t size = get_file_size(stream);
+    u8 *data = (u8 *)malloc(size + 1);
+    data[size] = 0x00;
+    fread(data, 1, size, stream);
+    return data;
+}
+
+static void PRINT(S2048_ctx *data)
+{
+    for(int x = 0;x < data->len; ++x) {
+        if (data->data[x] == 0x00) {
+            printf("\x1b[91m%02x\x1b[0m", data->data[x]);
+        } else {
+            printf("%02x", data->data[x]);
+        }
+        if((x+1) % 32 == 0) {printf("\n");} else {printf(" ");}
+    }
+}
+
+static void PRINT_KEY(u8 **total_key)
+{
+    for(int x = 0; x < NUMBER_OF_ROUNDS; ++x) {
+        for(int  y = 0; y < 256; ++y) {
+            printf("%02x", total_key[x][y]);
+            if((y+1) % 32 == 0) {
+                printf("\n");
+            } else {
+                printf(" ");
+            }
+        }
+        printf("\n");
+    }
+}
+
+static int to_int(int c)
+{
+    if (c >= 'a' && c <= 'f')
+        return c - 'a' + 10;
+    else if(c >= 'A' && c <= 'F')
+        return c - 'A' + 10;
+    else if (c >= '0' && c <= '9')
+        return c - '0';
+    return -1;
+}
+
+static uint8_t *htob(char *text)
+{
+    const uint32_t len = strlen(text);
+    if (len % 2 != 0) {return NULL;}
+    uint64_t i, j, x, top, bot;
+    uint8_t *ch = (uint8_t *)calloc(len / 2, 1);
+    for (i = j = x = 0; i < len; i += 2, x++) {
+        top = to_int(text[i]), bot = to_int(text[i+1]);
+        if (top == -1 || bot == -1) {
+            printf("Non Hex!\n"); return NULL;
+        } ch[x] = (top << 4) + bot;
+    } return ch;
+}
+
+#endif

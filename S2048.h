@@ -32,7 +32,8 @@ typedef uint64_t u64;
 #define True 1
 #define False 0
 
-#define ENCRYPT(data, key) ((data - key ^ ~(key + 13)) ^ data)
+#define ENCRYPT(data, key) (u8)((data - key ^ ~(key + 13)) - (key + 78 >> 1))
+#define DECRYPT(data, key) (u8)((data + (key + 78 >> 1) ^ ~(key + 13)) + key)
 
 // * 基本的变量 * //
 typedef struct {
@@ -203,8 +204,7 @@ static int S2048_DECRYPT(S2048_ctx *data, u8 **total_key)
     u8 keyindex; u64 rounds, x;
     for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
         for(x = keyindex = 0; x < data->len; ++x, ++keyindex) {
-            data->data[x] = data->data[x] ^ total_key[rounds][keyindex];
-            data->data[x] = data->data[x] ^ total_key[NUMBER_OF_ROUNDS - rounds - 1][keyindex];
+            data->data[x] = DECRYPT(data->data[x], total_key[rounds][keyindex]);
         }
     }
     return 0;

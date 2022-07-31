@@ -4,11 +4,12 @@
 > https://afdian.net/@sngrotesque<br>
 > https://sng.fanbox.cc/
 
-> 当前版本: Beta v0.7
+> 当前版本: Beta v0.7.1
 
 ##### Beta v0.7.1
 ```c
-由于目前发现一些问题，已经正在修复，还请暂时停止使用。
+Bug fix:
+    1. 修补了一个其实完全不用在意的对称加密算法都容易存在的问题。
 ```
 
 ##### Beta v0.7

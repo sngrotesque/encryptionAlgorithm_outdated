@@ -32,8 +32,7 @@ typedef uint64_t u64;
 #define True 1
 #define False 0
 
-// * 用在加密与解密函数中的初始宏定义函数 * //
-#define BIN_R(x) (x ^ 0xFF)
+#define ENCRYPT(data, key) ((data - key ^ ~(key + 13)) ^ data)
 
 // * 基本的变量 * //
 typedef struct {
@@ -41,26 +40,6 @@ typedef struct {
     u8 *token;  // 用于加密解密的口令，你可以理解为密钥
     u64 len;    // 数据的字节长度
 } S2048_ctx;
-
-// * 初始混淆值（用于打乱密钥的值 (可自定义)） * //
-const static u8 *sbox = {
-    "\x7d\xf6\x32\x6b\xd8\xa6\x46\x7d\x73\xd0\x74\x17\xe9\x15\xcd\xc3"
-    "\x27\xd5\x2b\x2c\x57\xec\xef\x02\xea\x18\x61\x99\xcb\xa0\xc0\x98"
-    "\x81\x19\x8a\x46\xd0\x7e\xa8\xda\xa9\xf5\x67\xe6\xdc\x37\x71\xba"
-    "\xa3\xf5\xff\x2c\x4c\x85\x4b\xdb\xc4\x97\x13\xcc\x48\x50\x21\x66"
-    "\x5a\x70\x8f\x0e\xe3\x76\x70\x7c\xcc\xd5\x38\x14\x01\x61\xed\x8d"
-    "\x53\xaa\xcf\x41\xb9\x8a\xd6\x0f\x1c\xa7\xa2\x30\xba\xe5\x95\x82"
-    "\x11\x97\x6d\xdc\xa6\x6f\xcd\xf7\x9e\x5a\xb9\x0c\x60\xe2\x75\x8d"
-    "\x5b\x60\xbe\xc9\xc2\x73\x18\x5d\x99\xe3\x02\x35\x36\x1c\x8a\xa2"
-    "\x6d\xd2\xc8\x51\x69\x0b\x58\x77\x89\xc6\x42\x2a\x49\xf7\xac\x0d"
-    "\x48\x4f\x6b\xe5\xea\xdb\xea\x92\xb7\x47\x61\xfa\xa1\x7f\x6b\xf5"
-    "\x73\xd4\x68\x73\xb2\x23\x33\x78\x05\x59\x8a\x63\xe9\x29\x12\x04"
-    "\x91\xa0\xab\xd9\x5f\xbd\xb6\xbf\x51\x16\xb4\x67\x5b\x4e\x55\x18"
-    "\x48\xa1\x26\x4d\x25\x48\xfe\xad\x90\x4c\x74\xf0\x4d\xb1\x65\xcd"
-    "\xe6\xfe\x44\xc1\xc9\xf9\x54\xef\x97\x2f\x0f\xdf\x99\x7b\x1a\xe9"
-    "\x47\x05\x1f\x40\x8e\x1d\x1f\x75\xf3\x0f\x86\x50\x93\x65\xef\xd8"
-    "\x2d\xde\x28\xb1\x8c\x4c\xf5\x5f\x98\x79\x1b\x4c\x0f\x4b\x66\x9b"
-};
 #endif
 
 #ifndef __SN_FUNCTION__
@@ -139,19 +118,58 @@ static void S2048_Key_Padding(S2048_ctx *data)
 */
 static u8 **S2048_Round_key_obfuscation(u8 *master_key)
 {
+    u8 sbox[BLOCK_SIZE] = {
+        0x05, 0xa0, 0x7a, 0x9f, 0xad, 0x90, 0x8a, 0xce,
+        0x49, 0x01, 0x93, 0xf4, 0xd8, 0x90, 0xd9, 0x13,
+        0x35, 0x68, 0x9e, 0x49, 0xb2, 0x37, 0x84, 0x79,
+        0xe6, 0xa7, 0xe6, 0x54, 0x01, 0x0a, 0x94, 0x5a,
+        0x15, 0x89, 0x68, 0x04, 0xbb, 0xca, 0xfa, 0xc3,
+        0x9b, 0x7e, 0x6a, 0xd3, 0xce, 0x65, 0xe4, 0x75,
+        0x12, 0x8b, 0x51, 0x8b, 0x3e, 0x36, 0xac, 0x86,
+        0xc0, 0x42, 0xb9, 0x70, 0xa7, 0x7b, 0x25, 0x40,
+        0xaf, 0x38, 0xa1, 0x4c, 0xfc, 0x22, 0x03, 0x99,
+        0x40, 0x64, 0x3e, 0xeb, 0x03, 0xd3, 0xfb, 0x34,
+        0x1f, 0xcf, 0x95, 0x9c, 0xda, 0x09, 0x42, 0x4e,
+        0x99, 0xb8, 0x09, 0x45, 0x3e, 0xd7, 0x9e, 0x07,
+        0x31, 0x4b, 0x7a, 0x23, 0xe0, 0xc8, 0xe0, 0x7e,
+        0x46, 0xe5, 0xa7, 0x73, 0x8e, 0xac, 0x4e, 0x2b,
+        0x11, 0x49, 0x05, 0x71, 0x7d, 0x40, 0xf3, 0x75,
+        0x1f, 0x16, 0xb8, 0x81, 0x02, 0xb6, 0x0a, 0xaf,
+        0x9f, 0xd4, 0xbf, 0xd5, 0xf2, 0x0a, 0x5b, 0x37,
+        0x13, 0x25, 0x5a, 0xce, 0x8b, 0x81, 0xb0, 0x43,
+        0xb4, 0xf7, 0x77, 0x41, 0x7f, 0x1f, 0xb2, 0xb1,
+        0x39, 0x2b, 0xf4, 0x18, 0x79, 0x61, 0x6e, 0x0d,
+        0x61, 0x69, 0x15, 0xe1, 0xfb, 0x10, 0xa9, 0x4c,
+        0x25, 0x9f, 0x1e, 0xf0, 0x03, 0xf8, 0x20, 0xfb,
+        0xce, 0x21, 0xd1, 0xbc, 0x2a, 0xf1, 0x5c, 0x27,
+        0x76, 0xcd, 0x25, 0xe0, 0x31, 0x10, 0xe9, 0x54,
+        0x64, 0x69, 0x9f, 0xd3, 0xbe, 0x23, 0xe0, 0x6a,
+        0x5a, 0x2c, 0xae, 0xc6, 0x7f, 0x95, 0xde, 0x50,
+        0xfe, 0xf5, 0xc6, 0xc8, 0xa6, 0xcf, 0x27, 0xae,
+        0x44, 0x36, 0x90, 0xab, 0x27, 0x2d, 0x04, 0x47,
+        0xc2, 0xde, 0x44, 0xb8, 0xb7, 0x72, 0x42, 0x83,
+        0x6b, 0x53, 0x5e, 0x0c, 0xcf, 0x58, 0xf8, 0xfd,
+        0xb1, 0xc9, 0x11, 0x44, 0xf5, 0x3f, 0xd4, 0x1c,
+        0xd9, 0xe4, 0x3e, 0x52, 0xc1, 0x7a, 0x0e, 0x17
+    };
+
     u8 **key_set = (u8 **)malloc(NUMBER_OF_ROUNDS * 8);
-    u8 *key_temp = (u8 *)malloc(BLOCK_SIZE), temp;
+    u8 *key_temp = (u8 *)malloc(BLOCK_SIZE), temp = 0;
     for(u32 rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
         key_set[rounds] = (u8 *)malloc(BLOCK_SIZE);
         memcpy(key_set[rounds], master_key, BLOCK_SIZE);
         for(u32 x = 0; x < BLOCK_SIZE; ++x) {
             switch(x) {
-                case 0: temp = key_set[rounds][x] ^ key_set[rounds][255]; break;
-                default: temp = key_set[rounds][x] ^ key_set[rounds][x-1]; break;
+                case 0:
+                    temp = key_set[rounds][x] ^ key_set[rounds][255];
+                    break;
+                default:
+                    temp = key_set[rounds][x] ^ key_set[rounds][x-1];
+                    break;
             }
             temp = temp ^ key_set[rounds][174];
             temp = ((x ^ temp) - rounds) ^ sbox[x];
-            key_temp[x] = BIN_R(temp);
+            key_temp[x] = temp ^ 0xcb;
         }
         master_key = key_temp;
     }
@@ -169,7 +187,7 @@ static int S2048_ENCRYPT(S2048_ctx *data, u8 **total_key)
     u8 keyindex; u64 rounds, x;
     for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
         for(x = keyindex = 0; x < data->len; ++x, ++keyindex) {
-            data->data[x] = BIN_R(data->data[x] ^ total_key[rounds][keyindex]);
+            data->data[x] = ENCRYPT(data->data[x], total_key[rounds][keyindex]);
         }
     }
     return 0;
@@ -185,92 +203,11 @@ static int S2048_DECRYPT(S2048_ctx *data, u8 **total_key)
     u8 keyindex; u64 rounds, x;
     for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
         for(x = keyindex = 0; x < data->len; ++x, ++keyindex) {
-            data->data[x] = BIN_R(data->data[x] ^ total_key[NUMBER_OF_ROUNDS - rounds - 1][keyindex]);
+            data->data[x] = data->data[x] ^ total_key[rounds][keyindex];
+            data->data[x] = data->data[x] ^ total_key[NUMBER_OF_ROUNDS - rounds - 1][keyindex];
         }
     }
     return 0;
 }
 #endif
 
-
-
-/*
-* 这是一些我自己在调试时会使用到的函数
-* 如果你需要请保留，如果不需要请删除
-*/
-#ifndef __MISC__
-#include <errno.h>
-#include <math.h>
-
-static int64_t get_file_size(FILE *stream)
-{
-    int64_t file_size = -1;
-    int64_t cur_offset = ftello64(stream);
-    fseeko64(stream, 0, SEEK_END);
-    file_size = ftello64(stream);
-    fseeko64(stream, cur_offset, SEEK_SET);
-    return file_size;
-}
-
-static uint8_t *file_read(FILE *stream)
-{
-    int64_t size = get_file_size(stream);
-    u8 *data = (u8 *)malloc(size + 1);
-    data[size] = 0x00;
-    fread(data, 1, size, stream);
-    return data;
-}
-
-static void PRINT(S2048_ctx *data)
-{
-    for(int x = 0;x < data->len; ++x) {
-        if (data->data[x] == 0x00) {
-            printf("\x1b[91m%02x\x1b[0m", data->data[x]);
-        } else {
-            printf("%02x", data->data[x]);
-        }
-        if((x+1) % 32 == 0) {printf("\n");} else {printf(" ");}
-    }
-}
-
-static void PRINT_KEY(u8 **total_key)
-{
-    for(int x = 0; x < NUMBER_OF_ROUNDS; ++x) {
-        for(int  y = 0; y < 256; ++y) {
-            printf("%02x", total_key[x][y]);
-            if((y+1) % 32 == 0) {
-                printf("\n");
-            } else {
-                printf(" ");
-            }
-        }
-        printf("\n");
-    }
-}
-
-static int to_int(int c)
-{
-    if (c >= 'a' && c <= 'f')
-        return c - 'a' + 10;
-    else if(c >= 'A' && c <= 'F')
-        return c - 'A' + 10;
-    else if (c >= '0' && c <= '9')
-        return c - '0';
-    return -1;
-}
-
-static uint8_t *htob(char *text)
-{
-    const uint32_t len = strlen(text);
-    if (len % 2 != 0) {return NULL;}
-    uint64_t i, j, x, top, bot;
-    uint8_t *ch = (uint8_t *)calloc(len / 2, 1);
-    for (i = j = x = 0; i < len; i += 2, x++) {
-        top = to_int(text[i]), bot = to_int(text[i+1]);
-        if (top == -1 || bot == -1) {
-            printf("Non Hex!\n"); return NULL;
-        } ch[x] = (top << 4) + bot;
-    } return ch;
-}
-
-#endif

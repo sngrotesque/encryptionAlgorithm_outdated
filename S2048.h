@@ -27,7 +27,7 @@ typedef uint64_t u64;
 // * 初始的宏定义 * //
 #define BLOCK_SIZE        256  // 256 Bytes
 #define PADDING_DATA      199  // 填充值 0xc7
-#define NUMBER_OF_ROUNDS  7    // 加密解密轮数
+#define NUMBER_OF_ROUNDS  9    // 加密解密轮数
 
 #define True 1
 #define False 0
@@ -190,6 +190,9 @@ static int S2048_ENCRYPT(S2048_ctx *data, u8 **total_key)
         for(x = keyindex = 0; x < data->len; ++x, ++keyindex) {
             data->data[x] = ENCRYPT(data->data[x], total_key[rounds][keyindex]);
         }
+        for(int a = 0; a < data->len; ++a) {
+            printf("%02x ", data->data[a]);
+        } printf("\n");
     }
     return 0;
 }

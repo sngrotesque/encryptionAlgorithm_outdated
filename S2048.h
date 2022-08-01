@@ -204,7 +204,7 @@ static int S2048_DECRYPT(S2048_ctx *data, u8 **total_key)
     u8 keyindex; u64 rounds, x;
     for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
         for(x = keyindex = 0; x < data->len; ++x, ++keyindex) {
-            data->data[x] = DECRYPT(data->data[x], total_key[rounds][keyindex]);
+            data->data[x] = DECRYPT(data->data[x], total_key[NUMBER_OF_ROUNDS - rounds - 1][keyindex]);
         }
     }
     return 0;

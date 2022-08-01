@@ -190,9 +190,6 @@ static int S2048_ENCRYPT(S2048_ctx *data, u8 **total_key)
         for(x = keyindex = 0; x < data->len; ++x, ++keyindex) {
             data->data[x] = ENCRYPT(data->data[x], total_key[rounds][keyindex]);
         }
-        for(int a = 0; a < data->len; ++a) {
-            printf("%02x ", data->data[a]);
-        } printf("\n");
     }
     return 0;
 }

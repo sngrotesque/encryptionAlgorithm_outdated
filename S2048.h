@@ -28,8 +28,8 @@ typedef uint64_t u64;
 #define PADDING_DATA      199  // 填充值 0xc7
 #define NUMBER_OF_ROUNDS  9    // 加密解密轮数
 
-#define ENCRYPT(data, key) (u8)((data - key ^ ~(key + 13)) - (key + 78 >> 1))
-#define DECRYPT(data, key) (u8)((data + (key + 78 >> 1) ^ ~(key + 13)) + key)
+#define ENCRYPT(data, key) (u8)(((data - key) ^ ~(key + 13)) - ((key + 78) >> 1))
+#define DECRYPT(data, key) (u8)((data + ((key + 78) >> 1) ^ ~(key + 13)) + key)
 
 // * 基本的变量 * //
 typedef struct {

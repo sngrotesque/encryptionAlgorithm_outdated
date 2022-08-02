@@ -29,17 +29,14 @@ typedef uint64_t u64;
 #define PADDING_DATA      199  // 填充值 0xc7
 #define NUMBER_OF_ROUNDS  9    // 加密解密轮数
 
-#define True 1
-#define False 0
-
 #define ENCRYPT(data, key) (u8)((data - key ^ ~(key + 13)) - (key + 78 >> 1))
 #define DECRYPT(data, key) (u8)((data + (key + 78 >> 1) ^ ~(key + 13)) + key)
 
 // * 基本的变量 * //
 typedef struct {
-    u8 *data;   // 用于加密或解密的数据
-    u8 *token;  // 用于加密解密的口令，你可以理解为密钥
-    u64 len;    // 数据的字节长度
+    u8 *data;   // 待处理数据
+    u8 **key;   // 密钥
+    u64 len;    // 单位bytes
 } S2048_ctx;
 #endif
 
@@ -91,18 +88,17 @@ static void S2048_Padding(S2048_ctx *data)
 *    如一个密钥为"123-456-789-0"，那么它会被填充为如下样式：
 *    123-456-789-0123-456-789-0123-456-789-0123-456-789-0 ...
 *
-* 2. 如果密钥长度大于256，此函数不会修改任何内容。
+* 2. 如果密钥长度大于等于256，此函数不会修改任何内容。
+*    但是长度都大于等于256了，你还执行这个函数干嘛？
 */
-static void S2048_Key_Padding(S2048_ctx *data)
+static u8 *S2048_Key_Padding(u8 *token, size_t token_n)
 {
-    size_t key_n = strlen((char *)data->token);
-    u8 *temp = (u8 *)malloc(BLOCK_SIZE + 1);
-    memcpy(temp, data->token, key_n);
-    temp[BLOCK_SIZE] = 0x00;
-    for(u32 x = key_n, index = 0; x < 256; ++x, ++index) {
-        if(index == key_n) index = 0;
-        temp[x] = data->token[index];
-    } data->token = temp;
+    u8 *tk_t = (u8 *)malloc(BLOCK_SIZE);
+    memcpy(tk_t, token, token_n);
+    for(u32 x = token_n, index = 0; x < 256; ++x, ++index) {
+        if(index == token_n) index = 0;
+        tk_t[x] = token[index];
+    } return tk_t;
 }
 
 /*
@@ -183,12 +179,12 @@ static u8 **S2048_Round_key_obfuscation(u8 *master_key)
 * 在加密之前请使用S2048_Round_key_obfuscation函数生成新密钥，
 * 并在之后使用新密钥与此加密函数进行运算。
 */
-static int S2048_ENCRYPT(S2048_ctx *data, u8 **total_key)
+static int S2048_ENCRYPT(S2048_ctx *data)
 {
     u8 keyindex; u64 rounds, x;
     for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
         for(x = keyindex = 0; x < data->len; ++x, ++keyindex) {
-            data->data[x] = ENCRYPT(data->data[x], total_key[rounds][keyindex]);
+            data->data[x] = ENCRYPT(data->data[x], data->key[rounds][keyindex]);
         }
     }
     return 0;
@@ -199,12 +195,12 @@ static int S2048_ENCRYPT(S2048_ctx *data, u8 **total_key)
 *
 * 请按照加密函数上的注释执行。
 */
-static int S2048_DECRYPT(S2048_ctx *data, u8 **total_key)
+static int S2048_DECRYPT(S2048_ctx *data)
 {
     u8 keyindex; u64 rounds, x;
     for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
         for(x = keyindex = 0; x < data->len; ++x, ++keyindex) {
-            data->data[x] = DECRYPT(data->data[x], total_key[NUMBER_OF_ROUNDS - rounds - 1][keyindex]);
+            data->data[x] = DECRYPT(data->data[x], data->key[NUMBER_OF_ROUNDS - rounds - 1][keyindex]);
         }
     }
     return 0;

@@ -2,26 +2,25 @@
 
 int main(int argc, char **argv)
 {
-    const char *plaintext = "Microsoft Windows NT 10.0, This is fucking shit!\n";
-    u8 *password = S2048_Key_Padding((u8 *)"hello, world", 12);
-
     S2048_ctx *data = (S2048_ctx *)malloc(sizeof(S2048_ctx));
-    data->data = (u8 *)malloc(1024);
-    data->len = strlen(plaintext);
-    data->key = S2048_Round_key_obfuscation(password);
+    const static uint32_t fileBlockSize = 4096;
 
-    memcpy(data->data, plaintext, strlen(plaintext));
+    data->data = (u8 *)malloc(fileBlockSize);
+    data->key = S2048_Round_key_obfuscation(S2048_Key_Padding(
+        "hello, world.\nPower by C Programming Language.", 48));
 
-    S2048_Padding(data);
+    FILE *fp_read  = fopen("misc_file/bilibili_2233.jpg", "rb");
+    FILE *fp_write = fopen("misc_file/bilibili_2233.jpg.enc", "wb");
 
-    S2048_ENCRYPT(data);
+    do {
+        data->len = fread(data->data, 1, fileBlockSize, fp_read);
+        S2048_ENCRYPT(data);
+        fwrite(data->data, 1, data->len, fp_write);
+    } while(!feof(fp_read));
 
-    printf("%s\n", data->data);
-
-    S2048_DECRYPT(data);
-
-    printf("%s\n", data->data);
-
+    fclose(fp_read);
+    fclose(fp_write);
     free(data);
+    return 0;
     return 0;
 }

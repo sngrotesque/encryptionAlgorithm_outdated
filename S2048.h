@@ -9,7 +9,7 @@
 * 接下来请阅读每个函数的详细注释。
 */
 
-// #include <time.h>
+#include <time.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -27,7 +27,6 @@ typedef uint64_t u64;
 #define BLOCK_SIZE        256  // 256 Bytes
 #define PADDING_DATA      199  // 填充值 0xc7
 #define NUMBER_OF_ROUNDS  9    // 加密解密轮数
-
 #define ENCRYPT(data, key) (u8)(((data - key) ^ ~(key + 13)) - ((key + 78) >> 1))
 #define DECRYPT(data, key) (u8)((data + ((key + 78) >> 1) ^ ~(key + 13)) + key)
 
@@ -81,6 +80,23 @@ static void S2048_Padding(S2048_ctx *data)
 }
 
 /*
+*    用于生成一段随机产生的256字节数据，可用作密钥或sbox
+*/
+static u8 *S2048_gen_sbox_keys()
+{
+    clockid_t a;
+    struct timespec p = {0, 0};
+    clock_gettime(a, &p);
+    srand((unsigned)p.tv_nsec);
+    u8 *data = (u8 *)malloc(BLOCK_SIZE);
+    if (data == NULL) return NULL;
+    for(short x = 0; x < BLOCK_SIZE; ++x) {
+        data[x] = rand() % (0xff - 0x00 + 1) + 0x00;
+    }
+    return data;
+}
+
+/*
 *    用于将密钥填充为256字节长度倍数的函数。
 * 
 * 1. 如果密钥长度小于256，此函数会用其自身数据进行填充直到256字节长度。
@@ -115,7 +131,7 @@ static u8 *S2048_Key_Padding(u8 *token, size_t token_n)
 * 请注意：
 *    ☆ 这一切的前提是你执行了密钥数据填充函数 ☆
 */
-static u8 **S2048_Round_key_obfuscation(u8 *master_key, u8 *sbox)
+static u8 **S2048_Round_obfuscation(u8 *master_key, u8 *sbox)
 {
     u8 **key_set = (u8 **)malloc(NUMBER_OF_ROUNDS * 8);
     u8 *key_temp = (u8 *)malloc(BLOCK_SIZE), temp = 0;
@@ -146,7 +162,7 @@ static u8 **S2048_Round_key_obfuscation(u8 *master_key, u8 *sbox)
 * 在加密之前请使用S2048_Round_key_obfuscation函数生成新密钥，
 * 并在之后使用新密钥与此加密函数进行运算。
 */
-static int S2048_ENCRYPT(S2048_ctx *data)
+static int S2048_encrypt(S2048_ctx *data)
 {
     u8 keyindex; u64 rounds, x;
     for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
@@ -162,7 +178,7 @@ static int S2048_ENCRYPT(S2048_ctx *data)
 *
 * 请按照加密函数上的注释执行。
 */
-static int S2048_DECRYPT(S2048_ctx *data)
+static int S2048_decrypt(S2048_ctx *data)
 {
     u8 keyindex; u64 rounds, x;
     for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {

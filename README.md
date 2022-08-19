@@ -4,7 +4,12 @@
 > https://afdian.net/@sngrotesque<br>
 > https://sng.fanbox.cc/
 
-> 当前版本: Beta v0.7.1
+> 当前版本: Beta v0.7.2
+
+##### Beta v0.7.2
+```c
+重新设计了sbox的使用形式
+```
 
 ##### Beta v0.7.1
 ```c

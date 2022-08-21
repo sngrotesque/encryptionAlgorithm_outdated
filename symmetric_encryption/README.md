@@ -1,8 +1,4 @@
-### Encryption algorithm written by 'SN-Grotesque'
-
-> 赞助: <br>
-> https://afdian.net/@sngrotesque<br>
-> https://sng.fanbox.cc/
+### Symmetric Encryption by SN-Grotesque
 
 > 当前版本: Beta v0.7.2
 

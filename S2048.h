@@ -1,40 +1,22 @@
-/*
-* W: 在开始之前，请确保你具有阅读此源代码的能力。
-* 
-* P.S: 此文档存在的目的是让使用此算法的人更好的理解它的工作原理。
-* 
-* 1. 每个区块的长度为2048位，就如目前市面上绝大多数的256位的加密算法。
-* 2. 默认情况下的填充值为一个0-255区间的十六进制值。
-* 
-* 接下来请阅读每个函数的详细注释。
-*/
-
-#include <time.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdint.h>
 #include <stdlib.h>
 
-#ifndef __S2048_OBJECT__
-#define __S2048_OBJECT__ 1
+#ifndef __S2048_H__
+#define __S2048_H__ 1
 
-#ifndef __SN_OBJECT__
-typedef uint8_t  u8;
-#endif
-typedef uint64_t u64;
+typedef unsigned char u8;
 
 #define S2048_BLOCK_SIZE   256
 #define PADDING_DATA       199
 #define NUMBER_OF_ROUNDS   9
-#define ENCRYPT(data, key) (u8)\
-    (((data - key) ^ ~(key + 78)) - ((u8)(key + 17) >> 1))
-#define DECRYPT(data, key) (u8)\
-    ((data + ((u8)(key + 17) >> 1) ^ ~(key + 78)) + key)
+#define ENCRYPT(data, key) (u8)(((data - key) ^ ~(key + 78)) - ((u8)(key + 17) >> 1))
+#define DECRYPT(data, key) (u8)((data + ((u8)(key + 17) >> 1) ^ ~(key + 78)) + key)
 
 typedef struct {
     u8 *data;
     u8 **key;
-    u64 size;
+    size_t size;
 } S2048_ctx;
 
 static const u8 sbox[S2048_BLOCK_SIZE] = {
@@ -72,88 +54,10 @@ static const u8 sbox[S2048_BLOCK_SIZE] = {
     0x54, 0x02, 0x85, 0x30, 0x2f, 0x40, 0xe7, 0x78
 };
 
-#ifndef __S2048_FUNCTION__
-#define __S2048_FUNCTION__ 1
+int S2048_Block_Padding(S2048_ctx *ctx);
+u8 *S2048_Key_Padding(u8 *token);
+u8 **S2048_RoundKey(u8 *master_key);
+int S2048_encrypt(S2048_ctx *ctx);
+int S2048_decrypt(S2048_ctx *ctx);
 
-static int S2048_Block_Padding(S2048_ctx *ctx)
-{
-    u64 padoffset = S2048_BLOCK_SIZE - ctx->size % S2048_BLOCK_SIZE;
-    u64 padding_n = ctx->size + padoffset;
-    u8 *temp = (u8 *)malloc(padding_n + 1);
-    if(!temp || !ctx->data || !ctx->size) return EOF;
-
-    memcpy(temp, ctx->data, ctx->size);
-    temp[padding_n] = 0x00;
-    for(u64 x = ctx->size; x < padding_n - 1; ++x)
-        temp[x] = PADDING_DATA;
-    ctx->data = temp;
-
-    if(padoffset == 256) {
-        ctx->data[padding_n - 2] = ctx->data[padding_n - 1] = 0xff;
-    } else {
-        ctx->data[padding_n - 1] = padoffset;
-    }
-    ctx->size = padding_n;
-    return 0;
-}
-
-static u8 *S2048_Key_Padding(u8 *token)
-{
-    if(!token) return NULL;
-    u8 *tk_t = (u8 *)malloc(S2048_BLOCK_SIZE);
-    size_t token_n = strlen((char *)token);
-    memcpy(tk_t, token, token_n);
-    for(int x = token_n, index = 0; x < 256; ++x, ++index) {
-        if(index == token_n) index = 0;
-        tk_t[x] = token[index];
-    } return tk_t;
-}
-
-static u8 **S2048_RoundKey(u8 *master_key)
-{
-    u8 **key_set = (u8 **)malloc(sizeof(u8 **) * NUMBER_OF_ROUNDS);
-    u8 *key_temp = (u8 *)malloc(S2048_BLOCK_SIZE), temp = 0;
-    if(!key_set || !key_temp) return NULL;
-
-    for(int rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
-        key_set[rounds] = (u8 *)malloc(S2048_BLOCK_SIZE);
-        memcpy(key_set[rounds], master_key, S2048_BLOCK_SIZE);
-        for(int x = 0; x < S2048_BLOCK_SIZE; ++x) {
-            switch(x) {
-                case 0:  temp = key_set[rounds][x] ^ key_set[rounds][255]; break;
-                default: temp = key_set[rounds][x] ^ key_set[rounds][x-1]; break;
-            }
-            temp = temp ^ key_set[rounds][174];
-            temp = ((x ^ temp) - rounds) ^ sbox[x];
-            key_temp[x] = temp ^ 0xcb;
-        }
-        master_key = key_temp;
-    }
-    return key_set;
-}
-
-static int S2048_encrypt(S2048_ctx *ctx)
-{
-    u8 keyindex; u64 rounds, x;
-    for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
-        for(x = keyindex = 0; x < ctx->size; ++x, ++keyindex) {
-            ctx->data[x] = ENCRYPT(ctx->data[x], ctx->key[rounds][keyindex]);
-        }
-    }
-    return 0;
-}
-
-static int S2048_decrypt(S2048_ctx *ctx)
-{
-    u8 keyindex; u64 rounds, x;
-    for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
-        for(x = keyindex = 0; x < ctx->size; ++x, ++keyindex) {
-            ctx->data[x] = DECRYPT(ctx->data[x],
-                ctx->key[NUMBER_OF_ROUNDS - rounds - 1][keyindex]);
-        }
-    }
-    return 0;
-}
-
-#endif
 #endif

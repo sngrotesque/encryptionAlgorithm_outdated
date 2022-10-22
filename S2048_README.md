@@ -3,7 +3,7 @@
 > 当前版本: v1.0.0 (Release)
 
 <table>
-    <tr>
+    <tr style="text-align:left;">
         <th>Version</th>  <th>description</th>
     </tr>
     <tr>

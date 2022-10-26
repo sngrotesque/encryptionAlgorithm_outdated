@@ -2,7 +2,9 @@
 ### Encryption algorithm written by 'SN-Grotesque'
 
 ```text
-S2048.h为对称加密算法
+S2048为对称加密算法
 
-S000.h为公钥密码算法
+S000为公钥密码算法
+
+MBS256为对称加密算法
 ```

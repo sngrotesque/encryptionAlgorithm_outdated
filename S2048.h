@@ -19,10 +19,10 @@ typedef struct {
     size_t size;
 } S2048_ctx;
 
-int S2048_Block_Padding(S2048_ctx *ctx);
-u8 *S2048_Key_Padding(u8 *token);
-u8 **S2048_RoundKey(u8 *master_key);
-int S2048_encrypt(S2048_ctx *ctx);
-int S2048_decrypt(S2048_ctx *ctx);
+int s2048_Block_Padding(S2048_ctx *ctx);
+u8 *s2048_Key_Padding(u8 *token);
+u8 **s2048_RoundKey(u8 *master_key);
+int s2048_encrypt(S2048_ctx *ctx);
+int s2048_decrypt(S2048_ctx *ctx);
 
 #endif

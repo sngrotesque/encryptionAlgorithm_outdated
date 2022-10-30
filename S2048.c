@@ -1,6 +1,6 @@
 #include "S2048.h"
 
-static const u8 sbox[S2048_BLOCK_SIZE] = {
+static const u8 S2048_SBOX[S2048_BLOCK_SIZE] = {
     0xcb, 0x06, 0x4d, 0x01, 0x9f, 0xfd, 0x67, 0x56,
     0x36, 0x07, 0x32, 0x54, 0x0f, 0xfd, 0x80, 0x8a,
     0x5d, 0x85, 0xe7, 0xe0, 0xb5, 0x93, 0x06, 0x78,
@@ -35,7 +35,7 @@ static const u8 sbox[S2048_BLOCK_SIZE] = {
     0x54, 0x02, 0x85, 0x30, 0x2f, 0x40, 0xe7, 0x78
 };
 
-int S2048_Block_Padding(S2048_ctx *ctx)
+int s2048_Block_Padding(S2048_ctx *ctx)
 {
     size_t padoffset = S2048_BLOCK_SIZE - ctx->size % S2048_BLOCK_SIZE;
     size_t padding_n = ctx->size + padoffset;
@@ -57,7 +57,7 @@ int S2048_Block_Padding(S2048_ctx *ctx)
     return 0;
 }
 
-u8 *S2048_Key_Padding(u8 *token)
+u8 *s2048_Key_Padding(u8 *token)
 {
     if(!token) return NULL;
     u8 *tk_t = (u8 *)malloc(S2048_BLOCK_SIZE);
@@ -69,7 +69,7 @@ u8 *S2048_Key_Padding(u8 *token)
     } return tk_t;
 }
 
-u8 **S2048_RoundKey(u8 *master_key)
+u8 **s2048_RoundKey(u8 *master_key)
 {
     u8 **key_set = (u8 **)malloc(sizeof(u8 **) * NUMBER_OF_ROUNDS);
     u8 *key_temp = (u8 *)malloc(S2048_BLOCK_SIZE), temp = 0;
@@ -84,7 +84,7 @@ u8 **S2048_RoundKey(u8 *master_key)
                 default: temp = key_set[rounds][x] ^ key_set[rounds][x-1]; break;
             }
             temp = temp ^ key_set[rounds][174];
-            temp = ((x ^ temp) - rounds) ^ sbox[x];
+            temp = ((x ^ temp) - rounds) ^ S2048_SBOX[x];
             key_temp[x] = temp ^ 0xcb;
         }
         master_key = key_temp;
@@ -92,7 +92,7 @@ u8 **S2048_RoundKey(u8 *master_key)
     return key_set;
 }
 
-int S2048_encrypt(S2048_ctx *ctx)
+int s2048_encrypt(S2048_ctx *ctx)
 {
     u8 keyindex; size_t rounds, x;
     for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {
@@ -103,7 +103,7 @@ int S2048_encrypt(S2048_ctx *ctx)
     return 0;
 }
 
-int S2048_decrypt(S2048_ctx *ctx)
+int s2048_decrypt(S2048_ctx *ctx)
 {
     u8 keyindex; size_t rounds, x;
     for(rounds = 0; rounds < NUMBER_OF_ROUNDS; ++rounds) {

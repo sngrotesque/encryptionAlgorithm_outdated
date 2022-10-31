@@ -17,9 +17,11 @@ static uint8_t sbox[4] = {
     96, 175, 229, 21
 };
 
-/*
-* in 是一个原文指针，in_file为这个指向内容的长度
-* key为密钥，out为指向输出内容的指针，需要提前申请in_file * 4的内存长度。
+/*in_size
+* in 是一个原文指针
+* in_size为这个指向内容的长度
+* key为密钥
+* out为指向输出内容的指针，需要提前申请（in_file * 4）的内存长度。
 */
 static int mbs256_encrypt(uint8_t *in, size_t in_size, uint16_t *key, uint8_t *out)
 {

@@ -13,6 +13,8 @@ typedef unsigned char u8;
 #define ENCRYPT(data, key) (u8)(((data - key) ^ ~(key + 78)) - ((u8)(key + 17) >> 1))
 #define DECRYPT(data, key) (u8)((data + ((u8)(key + 17) >> 1) ^ ~(key + 78)) + key)
 
+#define _PADOFFSET(size) (S2048_BLOCK_SIZE - size % S2048_BLOCK_SIZE)
+
 typedef struct {
     u8 *data;
     u8 **key;

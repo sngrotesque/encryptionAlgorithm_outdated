@@ -7,13 +7,14 @@
 
 typedef unsigned char u8;
 
-#define S2048_BLOCK_SIZE   256
-#define PADDING_DATA       199
-#define NUMBER_OF_ROUNDS   9
-#define ENCRYPT(data, key) (u8)(((data - key) ^ ~(key + 78)) - ((u8)(key + 17) >> 1))
-#define DECRYPT(data, key) (u8)((data + ((u8)(key + 17) >> 1) ^ ~(key + 78)) + key)
+#define S2048_BlockSize 256
+#define S2048_Padding 0x07
+#define S2048_TotalRounds 9
 
-#define _PADOFFSET(size) (S2048_BLOCK_SIZE - size % S2048_BLOCK_SIZE)
+#define S2048_E(m, k) ((((m-k) ^ ~(k+78)) - (((k+17) & 0xff) >> 1)) & 0xff)
+#define S2048_D(c, k) (((c + (((k+17) & 0xff) >> 1) ^ ~(k+78)) + k) & 0xff)
+
+#define S2048_PAD(size) (S2048_BlockSize - size % S2048_BlockSize)
 
 typedef struct {
     u8 *data;
@@ -21,8 +22,8 @@ typedef struct {
     size_t size;
 } S2048_ctx;
 
-int s2048_Block_Padding(S2048_ctx *ctx);
-u8 *s2048_Key_Padding(u8 *token);
+int s2048_BlockPaddingAdd(S2048_ctx *ctx);
+u8 *s2048_keyPadding(u8 *token);
 u8 **s2048_RoundKey(u8 *master_key);
 int s2048_encrypt(S2048_ctx *ctx);
 int s2048_decrypt(S2048_ctx *ctx);

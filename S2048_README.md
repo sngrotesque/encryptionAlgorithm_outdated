@@ -1,9 +1,13 @@
 ### Symmetric Encryption by SN-Grotesque
 
-> 当前版本: v1.0.0 (Release)
+> 当前版本: v1.1.0 (Release)
 
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
+| v1.1.0          | 展开了以往压缩的代码                                                       |
+|                 | 修改了填充值                                                               |
+|                 | 重新设计了函数，宏定义，变量名                                             |
+| v1.0.1          | 简单修改了一下代码的格式                                                   |
 | v1.0.0          | 将此仓库闭源，并重新设计了使用形式                                         |
 |                 | 修改了ENCRYPT与DECRYPT的宏定义，使其更不易被破译                           |
 | Beta v0.7.2     | 重新设计了sbox的使用形式                                                   |

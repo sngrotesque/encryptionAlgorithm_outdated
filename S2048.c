@@ -92,6 +92,35 @@ int s2048_BlockPaddingAdd(S2048_ctx *ctx)
     return 0;
 }
 
+int s2048_BlockPaddingRemove(S2048_ctx *ctx)
+{
+    if(!ctx->size || ctx->size % S2048_BlockSize) {
+        return EOF;
+    }
+    u8 *__buffer = NULL;
+    size_t realSize = 0;
+
+    switch(ctx->data[ctx->size-1] & ctx->data[ctx->size-2]) {
+        case 0xff:
+            realSize = ctx->size - S2048_BlockSize;
+            break;
+        default:
+            realSize = ctx->size - ctx->data[ctx->size-1];
+            break;
+    }
+    __buffer = (u8 *)malloc(realSize+1);
+    __buffer[realSize] = 0x00;
+
+    if(!memcpy(__buffer, ctx->data, realSize)) {
+        return EOF;
+    }
+
+    ctx->data = __buffer;
+    ctx->size = realSize;
+
+    return 0;
+}
+
 u8 *s2048_keyPadding(u8 *token)
 {
     if(!token)

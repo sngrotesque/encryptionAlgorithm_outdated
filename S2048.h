@@ -23,6 +23,7 @@ typedef struct {
 } S2048_ctx;
 
 int s2048_BlockPaddingAdd(S2048_ctx *ctx);
+int s2048_BlockPaddingRemove(S2048_ctx *ctx);
 u8 *s2048_keyPadding(u8 *token);
 u8 **s2048_RoundKey(u8 *master_key);
 int s2048_encrypt(S2048_ctx *ctx);

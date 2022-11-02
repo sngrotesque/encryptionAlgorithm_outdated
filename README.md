@@ -1,8 +1,8 @@
 # 由SN-Grotesque开启并维护的加密算法项目
 ###### Encryption algorithm written by 'SN-Grotesque'
 
-# Symmetric Encryption by SN-Grotesque
-### S2048: v1.1.1 (Release)
+### Symmetric Encryption by SN-Grotesque
+##### S2048: v1.1.1 (Release)
 
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
@@ -33,4 +33,13 @@
 
 ### MBS256: v0.0.1 (Beta)
 
-### S000: v0.0.1 (Beta)
+| 版本号(Version) | 描述(Description)                                                          |
+| :---            | :---                                                                       |
+| v0.0.1          | 正在开发中...                                                              |
+
+### Public-key Cryptography by SN-Grotesque
+##### S000: v0.0.1 (Beta)
+
+| 版本号(Version) | 描述(Description)                                                          |
+| :---            | :---                                                                       |
+| v0.0.1          | 正在开发中...                                                              |

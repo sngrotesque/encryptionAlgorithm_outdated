@@ -123,7 +123,10 @@ int s2048_BlockPaddingRemove(S2048_ctx *ctx)
 
 u8 *s2048_keyPadding(u8 *token)
 {
-    if(!token) return NULL;
+    if(!token)
+        return NULL;
+    if(strlen((char *)token) >= S2048_BlockSize)
+        return token;
 
     u8 *_ptr = token;
     int tokenSize, tokenIndex, index, createNewMemoryData;

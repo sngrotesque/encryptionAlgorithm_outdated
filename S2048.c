@@ -48,13 +48,23 @@ int s2048_BlockPaddingAdd(S2048_ctx *ctx)
     u8 *__buffer = NULL, *__temp = NULL;
     int createNewMemoryData;
 
+    if(!ctx->data || !ctx->size)
+        return EOF;
+
     padoffset = S2048_PAD(ctx->size);
     padding_n = ctx->size + padoffset;
 
+    printf(
+        "填充量: %lu\n"
+        "总大小: %lu\n",
+        padoffset,
+        padding_n
+    );
+
     __temp = ctx->data;
     createNewMemoryData = 0;
-    for(short x = 0; x < S2048_BlockSize; ++x) {
-        switch(__temp[x]) {
+    for(index = ctx->size; index < padding_n; ++index) {
+        switch(__temp[index]) {
             case 0x00:
                 break;
             default:
@@ -66,14 +76,12 @@ int s2048_BlockPaddingAdd(S2048_ctx *ctx)
     }
 
     if(createNewMemoryData) {
+        printf(">>>> 申请新的内存空间.\n");
         __buffer = (u8 *)malloc(padding_n + 1);
         memcpy(__buffer, ctx->data, ctx->size);
     } else {
         __buffer = ctx->data;
     }
-
-    if(!__buffer || !ctx->data || !ctx->size)
-        return EOF;
 
     for(index = ctx->size; index < padding_n-1; ++index)
         __buffer[index] = S2048_Padding;

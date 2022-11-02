@@ -3,7 +3,6 @@
 
 ### Symmetric Encryption by SN-Grotesque
 ##### S2048: v1.1.1 (Release)
-
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
 | v1.1.1          | 修复了上一个版本s2048_BlockPaddingAdd函数的BUG                             |
@@ -31,15 +30,15 @@
 |                 | 不足时填充为256的倍数                                                      |
 |                 | 初始为14轮加密                                                             |
 
-### MBS256: v0.0.1 (Beta)
-
+##### MBS256: v0.0.1 (Beta)
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
 | v0.0.1          | 正在开发中...                                                              |
 
+
+
 ### Public-key Cryptography by SN-Grotesque
 ##### S000: v0.0.1 (Beta)
-
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
 | v0.0.1          | 正在开发中...                                                              |

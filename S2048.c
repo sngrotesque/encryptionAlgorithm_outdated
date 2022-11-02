@@ -54,13 +54,6 @@ int s2048_BlockPaddingAdd(S2048_ctx *ctx)
     padoffset = S2048_PAD(ctx->size);
     padding_n = ctx->size + padoffset;
 
-    printf(
-        "填充量: %lu\n"
-        "总大小: %lu\n",
-        padoffset,
-        padding_n
-    );
-
     __temp = ctx->data;
     createNewMemoryData = 0;
     for(index = ctx->size; index < padding_n; ++index) {
@@ -76,7 +69,6 @@ int s2048_BlockPaddingAdd(S2048_ctx *ctx)
     }
 
     if(createNewMemoryData) {
-        printf(">>>> 申请新的内存空间.\n");
         __buffer = (u8 *)malloc(padding_n + 1);
         memcpy(__buffer, ctx->data, ctx->size);
     } else {

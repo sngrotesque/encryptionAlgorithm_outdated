@@ -162,31 +162,37 @@ u8 *s2048_keyPadding(u8 *token)
 
 u8 **s2048_RoundKey(u8 *master_key)
 {
-    u8 **key_set = (u8 **)malloc(sizeof(u8 **) * S2048_TotalRounds);
-    u8 *key_temp = (u8 *)malloc(S2048_BlockSize);
-    u8 temp = 0;
-    if(!key_set || !key_temp) return NULL;
+    u8 **keySeq, *keyBuffer, t;
+    short rounds, x;
 
-    for(short rounds = 0; rounds < S2048_TotalRounds; ++rounds) {
-        key_set[rounds] = (u8 *)malloc(S2048_BlockSize);
-        memcpy(key_set[rounds], master_key, S2048_BlockSize);
-        for(short x = 0; x < S2048_BlockSize; ++x) {
+    keySeq = (u8 **)malloc(8*S2048_TotalRounds);
+    keyBuffer = (u8 *)malloc(S2048_BlockSize);
+
+    if(!keySeq || !keyBuffer)
+        return NULL;
+
+    for(rounds = 0; rounds < S2048_TotalRounds; ++rounds) {
+        keySeq[rounds] = (u8 *)malloc(S2048_BlockSize);
+        memcpy(keySeq[rounds], master_key, S2048_BlockSize);
+        
+        for(x = 0; x < S2048_BlockSize; ++x) {
             switch(x) {
                 case 0:
-                    temp = key_set[rounds][x] ^ key_set[rounds][255];
+                    t = keySeq[rounds][x] ^ keySeq[rounds][255];
                     break;
                 default:
-                    temp = key_set[rounds][x] ^ key_set[rounds][x-1];
+                    t = keySeq[rounds][x] ^ keySeq[rounds][x-1];
                     break;
             }
-            temp = temp ^ key_set[rounds][174];
-            temp = ((x ^ temp) - rounds) ^ S2048_SBOX[x];
-            key_temp[x] = temp ^ 0xcb;
+            t = t ^ keySeq[rounds][174];
+            t = ((x ^ t) - rounds) ^ S2048_SBOX[x];
+            keyBuffer[x] = t ^ 0xcb;
         }
-        master_key = key_temp;
+        
+        master_key = keyBuffer;
     }
 
-    return key_set;
+    return keySeq;
 }
 
 int s2048_encrypt(S2048_ctx *ctx)

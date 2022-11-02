@@ -123,20 +123,38 @@ int s2048_BlockPaddingRemove(S2048_ctx *ctx)
 
 u8 *s2048_keyPadding(u8 *token)
 {
-    if(!token)
-        return NULL;
+    if(!token) return NULL;
 
-    u8 *tk_t = (u8 *)malloc(S2048_BlockSize);
-    size_t token_n = strlen((char *)token);
-    memcpy(tk_t, token, token_n);
+    u8 *_ptr = token;
+    int tokenSize, tokenIndex, index, createNewMemoryData;
 
-    for(int x = token_n, index = 0; x < 256; ++x, ++index) {
-        if(index == token_n)
-            index = 0;
-        tk_t[x] = token[index];
+    tokenSize = (unsigned short)strlen((char *)_ptr);
+    createNewMemoryData = 0;
+    for(index = tokenSize; index < S2048_BlockSize; ++index) {
+        switch(_ptr[index]) {
+            case 0x00:
+                break;
+            default:
+                createNewMemoryData = 1;
+                break;
+        }
+        if(createNewMemoryData)
+            break;
     }
 
-    return tk_t;
+    if(createNewMemoryData) {
+        _ptr = (u8 *)malloc(S2048_BlockSize);
+        memcpy(_ptr, token, tokenSize);
+    }
+
+    for(index = tokenSize, tokenIndex = 0; index < S2048_BlockSize; ++index, ++tokenIndex) {
+        if(tokenIndex == tokenSize) {
+            tokenIndex = 0;
+        }
+        _ptr[index] = _ptr[tokenIndex];
+    }
+
+    return _ptr;
 }
 
 u8 **s2048_RoundKey(u8 *master_key)

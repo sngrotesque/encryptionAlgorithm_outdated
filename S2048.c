@@ -197,13 +197,12 @@ u8 **s2048_RoundKey(u8 *master_key)
 
 int s2048_encrypt(S2048_ctx *ctx)
 {
-    u8 keyindex;
-    size_t rounds;
-    size_t x;
+    size_t rounds, x;
+    u8 keyIndex;
 
     for(rounds = 0; rounds < S2048_TotalRounds; ++rounds) {
-        for(x = keyindex = 0; x < ctx->size; ++x, ++keyindex) {
-            ctx->data[x] = S2048_E(ctx->data[x], ctx->key[rounds][keyindex]);
+        for(x = keyIndex = 0; x < ctx->size; ++x, ++keyIndex) {
+            ctx->data[x] = S2048_E(ctx->data[x], ctx->key[rounds][keyIndex]);
         }
     }
 
@@ -212,14 +211,13 @@ int s2048_encrypt(S2048_ctx *ctx)
 
 int s2048_decrypt(S2048_ctx *ctx)
 {
-    u8 keyindex;
-    size_t rounds;
-    size_t x;
+    size_t rounds, x;
+    u8 keyIndex;
 
     for(rounds = 0; rounds < S2048_TotalRounds; ++rounds) {
-        for(x = keyindex = 0; x < ctx->size; ++x, ++keyindex) {
+        for(x = keyIndex = 0; x < ctx->size; ++x, ++keyIndex) {
             ctx->data[x] = S2048_D(ctx->data[x],
-                ctx->key[S2048_TotalRounds - rounds - 1][keyindex]);
+                ctx->key[S2048_TotalRounds - rounds - 1][keyIndex]);
         }
     }
 

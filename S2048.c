@@ -1,6 +1,6 @@
 #include "S2048.h"
 
-static u8 S2048_SBOX[S2048_BlockSize] = {
+static u8 S2048_IV[S2048_BlockSize] = {
     0xcb, 0x06, 0x4d, 0x01, 0x9f, 0xfd, 0x67, 0x56,
     0x36, 0x07, 0x32, 0x54, 0x0f, 0xfd, 0x80, 0x8a,
     0x5d, 0x85, 0xe7, 0xe0, 0xb5, 0x93, 0x06, 0x78,
@@ -185,7 +185,7 @@ u8 **s2048_RoundKey(u8 *master_key)
                     break;
             }
             t = t ^ keySeq[rounds][174];
-            t = ((x ^ t) - rounds) ^ S2048_SBOX[x];
+            t = ((x ^ t) - rounds) ^ S2048_IV[x];
             keyBuffer[x] = t ^ 0xcb;
         }
         

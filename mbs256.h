@@ -10,37 +10,30 @@
 #define MBS256_BlockSize 32
 #define MBS256_Round 3
 
-#define _ENCRYPT(m, k) (uint16_t)((m << 4) ^ k)
-#define _DECRYPT(c, k) (uint16_t)((c ^ k) >> 4)
+typedef struct {
+    uint8_t *data;
+    size_t size;
+    uint8_t *PrivateKey;
+} mbs256_ctx;
 
-static uint8_t sbox[4] = {
-    96, 175, 229, 21
+static uint8_t MBS256_SBOX[MBS256_BlockSize] = {
+    0x6a, 0xfa, 0xa9, 0x13, 0x97, 0xf6, 0x11, 0x45,
+    0xa7, 0x4b, 0xca, 0xdc, 0x7b, 0x41, 0xda, 0x9f,
+    0xb4, 0xc2, 0x76, 0x1b, 0x22, 0x54, 0x3d, 0xcf,
+    0xfa, 0xb3, 0x4d, 0x12, 0xb7, 0x6e, 0x7e, 0x9f
 };
 
-/*in_size
-* in 是一个原文指针
-* in_size为这个指向内容的长度
-* key为密钥
-* out为指向输出内容的指针，需要提前申请（in_file * 4）的内存长度。
-*/
-static int mbs256_encrypt(uint8_t *in, size_t in_size, uint16_t *key, uint8_t *out)
-{
-    if(!in || !in_size || !key || !out)
-        return EOF;
 
-    uint8_t __buff[5], keyIndex;
-    size_t in_index, out_index;
-    for(in_index = out_index = keyIndex = 0; in_index < in_size; ++in_index, ++keyIndex, out_index += 4) {
-        if(keyIndex == MBS256_BlockSize)
-            keyIndex = 0;
-        sprintf((char *)__buff, "%04x", _ENCRYPT(in[in_index], key[keyIndex]));
-        for(uint8_t tempIndex = 0; tempIndex < 4; ++tempIndex) {
-            out[out_index + tempIndex] = __buff[tempIndex] ^ sbox[tempIndex];
-        }
-    }
 
-    return 0;
-}
+
+
+
+
+
+
+
+
+
 
 
 #endif

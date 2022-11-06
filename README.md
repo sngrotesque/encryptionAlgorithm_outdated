@@ -2,9 +2,10 @@
 ###### Encryption algorithm written by 'SN-Grotesque'
 
 ### Symmetric Encryption by SN-Grotesque
-##### S2048: v1.1.1 (Release)
+##### S2048: v1.1.2 (Release)
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
+| v1.1.2          | SBOX修改为IV，后续版本添加真正的sbox与rsbox                                |
 | v1.1.1          | 修复了上一个版本s2048_BlockPaddingAdd函数的BUG                             |
 |                 | 如果原数据的内存空间足够存放填充数据那么就不申请新的内存空间               |
 |                 | 重构了s2048_keyPadding函数内容                                             |

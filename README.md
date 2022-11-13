@@ -35,8 +35,8 @@
 ##### MBS256: v0.0.1 (Beta)
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
+| v1.0.0          | 512位分组加密算法                                                          |
 | v0.0.1          | 正在开发中...                                                              |
-
 
 
 ### Public-key Cryptography by SN-Grotesque

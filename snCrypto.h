@@ -132,22 +132,22 @@ const uint8_t MBS512_SUBKEY_BOX[MBS512_BlockSize] = {
 #ifndef __S2048_H__
 #define __S2048_H__
 #define S2048_BlockSize 256
-#define S2048_TotalRounds 9
+#define S2048_Rounds 9
 #define S2048_E(m, k) ((((m-k) ^ ~(k+78)) - (((k+17) & 0xff) >> 1)) & 0xff)
 #define S2048_D(c, k) (((c + (((k+17) & 0xff) >> 1) ^ ~(k+78)) + k) & 0xff)
 
-typedef unsigned char u8;
 typedef struct {
-    u8 *data;
-    u8 **key;
+    uint8_t *data;
+    uint8_t *key;
+    uint8_t keySet[S2048_Rounds][S2048_BlockSize];
     size_t size;
 } s2048_ctx;
 
-u8 **s2048_RoundKey(u8 *master_key);
+void s2048_RoundKey(s2048_ctx *ctx);
 void s2048_encrypt(s2048_ctx *ctx);
 void s2048_decrypt(s2048_ctx *ctx);
 
-static u8 S2048_IV[S2048_BlockSize] = {
+static uint8_t S2048_IV[S2048_BlockSize] = {
     0xcb, 0x06, 0x4d, 0x01, 0x9f, 0xfd, 0x67, 0x56,
     0x36, 0x07, 0x32, 0x54, 0x0f, 0xfd, 0x80, 0x8a,
     0x5d, 0x85, 0xe7, 0xe0, 0xb5, 0x93, 0x06, 0x78,

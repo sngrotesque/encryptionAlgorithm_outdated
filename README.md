@@ -5,6 +5,7 @@
 ##### S2048: v1.1.2 (Release)
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
+| v1.2.1          | 修改了s2048_RoundKey，s2048_ctx的构造节省系统资源                          |
 | v1.1.2          | SBOX修改为IV，后续版本添加真正的sbox与rsbox                                |
 | v1.1.1          | 修复了上一个版本s2048_BlockPaddingAdd函数的BUG                             |
 |                 | 如果原数据的内存空间足够存放填充数据那么就不申请新的内存空间               |
@@ -32,7 +33,7 @@
 |                 | 不足时填充为256的倍数                                                      |
 |                 | 初始为14轮加密                                                             |
 
-##### MBS512: v1.0.0
+##### MBS512: v1.0.0 (Release)
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
 | v1.0.0          | 修改为512位分组加密算法                                                    |
@@ -42,7 +43,6 @@
 | Beta v0.0.1     | 初始大纲：256位分组对称加密算法                                            |
 |                 | 明文输入为uint8_t类型，密文输出与密钥为0x1000 ~ 0xffff的uint16_t类型数据   |
 |                 | MBS名称就是这么来的，3轮加密与解密                                         |
-
 
 ### Public-key Cryptography by SN-Grotesque
 ##### S000: v0.0.1 (Beta)

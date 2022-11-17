@@ -39,7 +39,6 @@ typedef struct {
     uint8_t *data;
     uint8_t *key;
     uint8_t keySet[S2048_Rounds][S2048_BlockSize];
-    size_t size;
 } s2048_ctx;
 
 void s2048_RoundKey(s2048_ctx *ctx);
@@ -62,7 +61,26 @@ void s2048_decrypt(s2048_ctx *ctx);
     M = C^SK % N
 */
 
-#define S000_F(x) (uint8_t)((x + (((x - 1) & (x << 4) & (x >> 2)) + (x * 2 - 17))) + 4)
+/*
+s000公钥密码算法思路
+
+公钥常数pkn为随意一个4位数字
+由此常数求出公钥：
+    pk = (pkn * (256 ** 24)) ^ (pkn ** 16)
+加解密公式：
+    c = m*pk mod N mod 256
+    m = c*sk mod N mod 256
+*/
+
+// #define S000_F(x) (uint8_t)((x + (((x - 1) & (x << 4) & (x >> 2)) + (x * 2 - 17))) + 4)
+#define GetPK(pkn) (double)((pkn * pow(256, 24)) ^ pow(pkn, 16))
+
+
+
+
+
+
+
 #endif
 
 

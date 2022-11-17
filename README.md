@@ -5,6 +5,7 @@
 ##### S2048: v1.1.2 (Release)
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
+| v1.2.2          | 删除了s2048_ctx内的size，更加贴合分组加密算法的理念                        |
 | v1.2.1          | 修改了s2048_RoundKey，s2048_ctx的构造节省系统资源                          |
 | v1.1.2          | SBOX修改为IV，后续版本添加真正的sbox与rsbox                                |
 | v1.1.1          | 修复了上一个版本s2048_BlockPaddingAdd函数的BUG                             |

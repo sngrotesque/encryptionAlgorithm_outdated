@@ -17,8 +17,8 @@
 #define MBS512_BOX_RANGE(i) ((i + (MBS512_BlockSize - 41)) % MBS512_BlockSize)
 
 typedef struct {
-    uint8_t *data;
-    uint8_t *key;
+    uint8_t data[MBS512_BlockSize+1];
+    uint8_t key[MBS512_BlockSize];
     uint8_t keySet[MBS512_Rounds][MBS512_BlockSize];
 } mbs512_ctx;
 
@@ -36,8 +36,8 @@ void mbs512_decrypt(mbs512_ctx *ctx);
 #define S2048_D(c, k) (((c + (((k+17) & 0xff) >> 1) ^ ~(k+78)) + k) & 0xff)
 
 typedef struct {
-    uint8_t *data;
-    uint8_t *key;
+    uint8_t data[S2048_BlockSize+1];
+    uint8_t key[S2048_BlockSize];
     uint8_t keySet[S2048_Rounds][S2048_BlockSize];
 } s2048_ctx;
 

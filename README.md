@@ -2,7 +2,7 @@
 ###### Encryption algorithm written by 'SN-Grotesque'
 
 ### Symmetric Encryption by SN-Grotesque
-##### S2048: v1.1.2 (Release)
+##### S2048: v1.2.2 (Release)
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
 | v1.2.2          | 删除了s2048_ctx内的size，更加贴合分组加密算法的理念                        |
@@ -49,4 +49,6 @@
 ##### S000: v0.0.1 (Beta)
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
-| v0.0.1          | 正在开发中...                                                              |
+| v0.0.1          | 公钥常数pkn为随意一个4位数字.                                              |
+|                 | 公钥公式 pk = (pkn * (256 ** 24)) ^ (pkn ** 16)                            |
+|                 | c = m\*pk mod N mod 256; m = c\*sk mod N mod 256                           |

@@ -20,6 +20,7 @@ typedef struct {
     uint8_t *data;
     uint8_t key[MBS512_BlockSize];
     uint8_t keySet[MBS512_Rounds][MBS512_BlockSize];
+    size_t  size;
 } mbs512_ctx;
 
 void mbs512_subKey(mbs512_ctx *ctx);
@@ -39,6 +40,7 @@ typedef struct {
     uint8_t *data;
     uint8_t key[S2048_BlockSize];
     uint8_t keySet[S2048_Rounds][S2048_BlockSize];
+    size_t  size;
 } s2048_ctx;
 
 void s2048_RoundKey(s2048_ctx *ctx);

@@ -2,9 +2,10 @@
 ###### Encryption algorithm written by 'SN-Grotesque'
 
 ### Symmetric Encryption by SN-Grotesque
-##### S2048: v1.2.2 (Release)
+##### S2048: v1.2.5 (Release)
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
+| v1.2.5          | 修复了v1.2.4版本中函数privateKeyRead中的不完善问题                         |
 | v1.2.4          | 还原了snCrypto_ctx内的size，使得部分功能更易使用                           |
 | v1.2.3          | 修改了部分代码细节，让代码更具便捷性                                       |
 | v1.2.2          | 删除了s2048_ctx内的size，更加贴合分组加密算法的理念                        |

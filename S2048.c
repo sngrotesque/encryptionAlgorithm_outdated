@@ -61,7 +61,8 @@ void s2048_RoundKey(s2048_ctx *ctx)
 
 void s2048_encrypt(s2048_ctx *ctx)
 {
-    size_t rounds, x;
+    size_t x;
+    uint8_t rounds;
     uint8_t keyIndex;
     for(rounds = 0; rounds < S2048_Rounds; ++rounds) {
         for(x = keyIndex = 0; x < ctx->size; ++x, ++keyIndex) {
@@ -72,7 +73,8 @@ void s2048_encrypt(s2048_ctx *ctx)
 
 void s2048_decrypt(s2048_ctx *ctx)
 {
-    size_t rounds, x;
+    size_t x;
+    uint8_t rounds;
     uint8_t keyIndex;
     for(rounds = 0; rounds < S2048_Rounds; ++rounds) {
         for(x = keyIndex = 0; x < ctx->size; ++x, ++keyIndex) {

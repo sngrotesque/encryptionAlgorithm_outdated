@@ -1,11 +1,19 @@
-#include <time.h>
-#include <math.h>
+#ifndef __SN_CRYPTO__ // snCrypto
+#define __SN_CRYPTO__
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include "../swap.h"
 
-#ifndef __MBS512_H__
+static void elementShift(uint8_t *data, size_t size)
+{
+    for(size_t i = 0; i < size / 2; ++i) {
+        swap_uint8(&data[i], &data[size - i - 1]);
+    }
+}
+
+#ifndef __MBS512_H__ // MBS512
 #define __MBS512_H__
 #define MBS512_BlockSize 64
 #define MBS512_Rounds 11
@@ -24,12 +32,11 @@ typedef struct {
 } mbs512_ctx;
 
 void mbs512_subKey(mbs512_ctx *ctx);
-void mbs512_rowReverse(mbs512_ctx *ctx);
 void mbs512_encrypt(mbs512_ctx *ctx);
 void mbs512_decrypt(mbs512_ctx *ctx);
-#endif
+#endif // MBS512
 
-#ifndef __S2048_H__
+#ifndef __S2048_H__ // S2048
 #define __S2048_H__
 #define S2048_BlockSize 256
 #define S2048_Rounds 9
@@ -46,9 +53,9 @@ typedef struct {
 void s2048_RoundKey(s2048_ctx *ctx);
 void s2048_encrypt(s2048_ctx *ctx);
 void s2048_decrypt(s2048_ctx *ctx);
-#endif
+#endif // S2048
 
-#ifndef __S000_H__
+#ifndef __S000_H__ // S000
 /*
     RSA算法的核心
     Q = 171
@@ -75,14 +82,7 @@ s000公钥密码算法思路
 */
 
 // #define S000_F(x) (uint8_t)((x + (((x - 1) & (x << 4) & (x >> 2)) + (x * 2 - 17))) + 4)
-#define GetPK(pkn) (double)((pkn * pow(256, 24)) ^ pow(pkn, 16))
+// #define GetPK(pkn) (double)((pkn * pow(256, 24)) ^ pow(pkn, 16))
+#endif // S000
 
-
-
-
-
-
-
-#endif
-
-
+#endif // snCrypto

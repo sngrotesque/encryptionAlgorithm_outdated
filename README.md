@@ -5,6 +5,8 @@
 ##### S2048: v1.2.5 (Release)
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
+| v1.3.0          | 添加了函数elementShift用于位移数据                                         |
+|                 | 删除了mbs512_rowReverse函数                                                |
 | v1.2.5          | 进行了微小改动                                                             |
 | v1.2.4          | 还原了snCrypto_ctx内的size，使得部分功能更易使用                           |
 | v1.2.3          | 修改了部分代码细节，让代码更具便捷性                                       |

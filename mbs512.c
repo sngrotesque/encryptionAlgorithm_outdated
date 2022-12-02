@@ -128,16 +128,6 @@ void mbs512_subKey(mbs512_ctx *ctx)
     }
 }
 
-void mbs512_rowReverse(mbs512_ctx *ctx)
-{
-    uint8_t i, t;
-    for(i = 0; i < ctx->size / 2; ++i) {
-        t = ctx->data[i];
-        ctx->data[i] = ctx->data[ctx->size - i - 1];
-        ctx->data[ctx->size - i - 1] = t;
-    }
-}
-
 void mbs512_encrypt(mbs512_ctx *ctx)
 {
     uint8_t round;

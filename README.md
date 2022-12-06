@@ -1,10 +1,12 @@
 # 由SN-Grotesque开启并维护的加密算法项目
 ###### Encryption algorithm written by 'SN-Grotesque'
 
-### Symmetric Encryption by SN-Grotesque
-##### S2048: v1.2.5 (Release)
+##### v2.0.0 (Beta)
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
+| v2.0.0 (Beta)   | 添加了s1568算法与qwy256算法                                                |
+|                 | 在是snCrypto.h库中添加了sbox与rsbox初始化函数，一个巨大的突破              |
+|                 | 学习AES加密算法CBC模式的思想实现了真正的分组加密                           |
 | v1.3.0          | 添加了函数elementShift用于位移数据                                         |
 |                 | 删除了mbs512_rowReverse函数                                                |
 | v1.2.5          | 进行了微小改动                                                             |
@@ -21,7 +23,11 @@
 |                 | 重新设计了函数，宏定义，变量名                                             |
 |                 | 添加了一个新函数s2048_BlockPaddingRemove                                   |
 | v1.0.1          | 简单修改了一下代码的格式                                                   |
-| v1.0.0          | 将此仓库闭源，并重新设计了使用形式                                         |
+| v1.0.0 (mbs512) | 修改为512位分组加密算法                                                    |
+|                 | 输入输出均为uint8_t类型数据                                                |
+|                 | 加密与解密采用11轮                                                         |
+|                 | 添加了IV，与子密钥盒，均可自定义                                           |
+| v1.0.0 (s2048)  | 将此仓库闭源，并重新设计了使用形式                                         |
 |                 | 修改了ENCRYPT与DECRYPT的宏定义，使其更不易被破译                           |
 | Beta v0.7.2     | 重新设计了sbox的使用形式                                                   |
 | Beta v0.7.1     | 修补了一个对称加密算法都容易存在的问题。                                   |
@@ -38,17 +44,6 @@
 |                 | 所有数据的长度均为256的倍数                                                |
 |                 | 不足时填充为256的倍数                                                      |
 |                 | 初始为14轮加密                                                             |
-
-##### MBS512: v1.0.0 (Release)
-| 版本号(Version) | 描述(Description)                                                          |
-| :---            | :---                                                                       |
-| v1.0.0          | 修改为512位分组加密算法                                                    |
-|                 | 输入输出均为uint8_t类型数据                                                |
-|                 | 加密与解密采用11轮                                                         |
-|                 | 添加了IV，与子密钥盒，均可自定义                                           |
-| Beta v0.0.1     | 初始大纲：256位分组对称加密算法                                            |
-|                 | 明文输入为uint8_t类型，密文输出与密钥为0x1000 ~ 0xffff的uint16_t类型数据   |
-|                 | MBS名称就是这么来的，3轮加密与解密                                         |
 
 ### Public-key Cryptography by SN-Grotesque
 ##### S000: v0.0.1 (Beta)

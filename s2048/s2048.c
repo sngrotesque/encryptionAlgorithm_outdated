@@ -68,7 +68,7 @@ void s2048_init_ctx(s2048_ctx *ctx, uint8_t *key)
     }
 }
 
-void s2048_cipher(s2048_state_t *state, s2048_state_t *keyBuf)
+void s2048_Cipher(s2048_state_t *state, s2048_state_t *keyBuf)
 {
     for(uint8_t x = 0; x < S2048_Maximum; ++x) {
         for(uint8_t y = 0; y < S2048_Maximum; ++y) {
@@ -77,23 +77,44 @@ void s2048_cipher(s2048_state_t *state, s2048_state_t *keyBuf)
     }
 }
 
-/*
-BUG威胁程度：高
-BUG原因：buf指针越界问题
-解决方案：
-    1. 使用减法将指向的地址指向为正确的地址
-    2. 将多层加密融合至s2048_cipher函数中
-*/
+void s2048_InvCipher(s2048_state_t *state, s2048_state_t *keyBuf)
+{
+    for(uint8_t x = 0; x < S2048_Maximum; ++x) {
+        for(uint8_t y = 0; y < S2048_Maximum; ++y) {
+            (*state)[x][y] = S2048_D((*state)[x][y], (*keyBuf)[x][y]);
+        }
+    }
+}
+
 void s2048_cbc_encrypt(s2048_ctx *ctx, uint8_t *buf, size_t size)
 {
-    size_t r, i;
+    if (size % S2048_BlockSize)
+        return;
+    
+    size_t r, i, n;
     uint8_t *buf_ptr = buf;
-
     for(r = 0; r < S2048_Rounds; ++r) {
-        for(i = 0; i < size; i += S2048_BlockSize) {
-            s2048_cipher((s2048_state_t *)buf_ptr, (s2048_state_t *)ctx->RK[r]);
+        for(i = 0; i < size; i += S2048_BlockSize, ++n) {
+            s2048_Cipher((s2048_state_t *)buf_ptr, (s2048_state_t *)ctx->RK[r]);
             buf_ptr += S2048_BlockSize;
         }
-        buf_ptr -= (r + 1) * S2048_BlockSize;
+        buf_ptr -= (r + 1) * (S2048_BlockSize * (n + 1));
+    }
+}
+
+void s2048_cbc_decrypt(s2048_ctx *ctx, uint8_t *buf, size_t size)
+{
+    if (size % S2048_BlockSize)
+        return;
+    
+    size_t r, i, n;
+    uint8_t *buf_ptr = buf;
+    for(r = 0; r < S2048_Rounds; ++r) {
+        for(i = 0; i < size; i += S2048_BlockSize, ++n) {
+            s2048_InvCipher((s2048_state_t *)buf_ptr,
+                (s2048_state_t *)ctx->RK[S2048_Rounds - r - 1]);
+            buf_ptr += S2048_BlockSize;
+        }
+        buf_ptr -= (r + 1) * (S2048_BlockSize * (n + 1));
     }
 }

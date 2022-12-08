@@ -1,5 +1,4 @@
 #include "s2048.h"
-#include <stdio.h>
 
 static const uint8_t sbox[S2048_BlockSize] = {
     // 0     1     2     3     4     5     6     7     8     9     A     B     C     D     E     F
@@ -81,6 +80,9 @@ void s2048_cipher(s2048_state_t *state, s2048_state_t *keyBuf)
 /*
 BUG威胁程度：高
 BUG原因：buf指针越界问题
+解决方案：
+    1. 使用减法将指向的地址指向为正确的地址
+    2. 将多层加密融合至s2048_cipher函数中
 */
 void s2048_cbc_encrypt(s2048_ctx *ctx, uint8_t *buf, size_t size)
 {
@@ -89,37 +91,9 @@ void s2048_cbc_encrypt(s2048_ctx *ctx, uint8_t *buf, size_t size)
 
     for(r = 0; r < S2048_Rounds; ++r) {
         for(i = 0; i < size; i += S2048_BlockSize) {
-            s2048_cipher(
-                (s2048_state_t *)buf_ptr,
-                (s2048_state_t *)ctx->RK[r]
-            );
+            s2048_cipher((s2048_state_t *)buf_ptr, (s2048_state_t *)ctx->RK[r]);
             buf_ptr += S2048_BlockSize;
         }
         buf_ptr -= (r + 1) * S2048_BlockSize;
     }
 }
-
-// void s2048_encrypt(s2048_ctx *ctx)
-// {
-//     size_t x;
-//     uint8_t rounds;
-//     uint8_t keyIndex;
-//     for(rounds = 0; rounds < S2048_Rounds; ++rounds) {
-//         for(x = keyIndex = 0; x < ctx->size; ++x, ++keyIndex) {
-//             ctx->data[x] = S2048_E(ctx->data[x], ctx->RK[rounds][keyIndex]);
-//         }
-//     }
-// }
-
-// void s2048_decrypt(s2048_ctx *ctx)
-// {
-//     size_t x;
-//     uint8_t rounds;
-//     uint8_t keyIndex;
-//     for(rounds = 0; rounds < S2048_Rounds; ++rounds) {
-//         for(x = keyIndex = 0; x < ctx->size; ++x, ++keyIndex) {
-//             ctx->data[x] = S2048_D(ctx->data[x],
-//                 ctx->RK[S2048_Rounds - rounds - 1][keyIndex]);
-//         }
-//     }
-// }

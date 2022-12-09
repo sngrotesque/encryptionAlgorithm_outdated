@@ -10,7 +10,8 @@
 
 #define S2048_E(m, k) ((((m - k) ^ ~(k+78)) - (((k+17) & 0xff) >> 1)) & 0xff)
 #define S2048_D(c, k) ((((c + (((k+17) & 0xff) >> 1)) ^ ~(k+78)) + k) & 0xff)
-#define S2048_RANGE(index) (((index - 7) % S2048_BlockSize) & 0xff)
+#define S2048_RANGE(index) ((index + 1) % S2048_BlockSize)
+#define S2048_RANGE_RK(index) (((index - 7) % S2048_BlockSize) & 0xff)
 #define S2048_INIT_RK(buf, iv, i, r) \
     S2048_D(S2048_D(buf, iv), S2048_D(buf ^ (iv - i), (i + r + (iv ^ buf))))
 

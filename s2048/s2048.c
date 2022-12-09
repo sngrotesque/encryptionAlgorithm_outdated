@@ -1,3 +1,4 @@
+#include "../snCrypto.h"
 #include "s2048.h"
 
 static const uint8_t sbox[S2048_BlockSize] = {
@@ -46,19 +47,20 @@ static const uint8_t rsbox[S2048_BlockSize] = {
     0xa4, 0x31, 0x2d, 0x00, 0xa2, 0xaf, 0xb7, 0xd4, 0xe7, 0x8d, 0xdc, 0x51, 0x2e, 0x55, 0x50, 0x38
 };
 
-#define S2048_GET_SBOX(n)  (sbox[n])
-#define S2048_GET_RSBOX(n) (rsbox[n])
+#define S2048_GET_SBOX(n)  (sbox[(n)])
+#define S2048_GET_RSBOX(n) (rsbox[(n)])
 
 void s2048_init_ctx(s2048_ctx *ctx, uint8_t *key)
 {
-    uint16_t r, i;
-    uint8_t buf, keyBuf[S2048_BlockSize];
+    register uint16_t r, i;
+    register uint8_t buf;
+    uint8_t keyBuf[S2048_BlockSize];
 
     memcpy(keyBuf, key, S2048_BlockSize);
     for(r = 0; r < S2048_Rounds; ++r) {
         memcpy(ctx->RK[r], keyBuf, S2048_BlockSize);
         for(i = 0; i < S2048_BlockSize; ++i) {
-            buf = ctx->RK[r][i] ^ ctx->RK[r][S2048_RANGE(i)] ^ ctx->RK[r][174];
+            buf = ctx->RK[r][i] ^ ctx->RK[r][S2048_RANGE_RK(i)] ^ ctx->RK[r][174];
             buf = ((i ^ buf) - r) ^ ctx->IV[i];
             keyBuf[i] = S2048_INIT_RK(buf, ctx->IV[i], i, r);
             keyBuf[i] = S2048_GET_SBOX(keyBuf[i] ^ 0xc9);
@@ -68,19 +70,31 @@ void s2048_init_ctx(s2048_ctx *ctx, uint8_t *key)
     }
 }
 
+void ColumnMix(s2048_state_t *buffer)
+{
+    // swap_uint8(&(*buffer)[0][0], &(*buffer)[0][1]);
+
+    // swap_uint8(&(*buffer)[1][0], &(*buffer)[1][1]);
+    // swap_uint8(&(*buffer)[1][1], &(*buffer)[0][1]);
+}
+
 void s2048_Cipher(s2048_state_t *state, s2048_state_t *keyBuf)
 {
-    for(uint8_t x = 0; x < S2048_Maximum; ++x) {
-        for(uint8_t y = 0; y < S2048_Maximum; ++y) {
+    register uint8_t x, y;
+    for(x = 0; x < S2048_Maximum; ++x) {
+        for(y = 0; y < S2048_Maximum; ++y) {
             (*state)[x][y] = S2048_E((*state)[x][y], (*keyBuf)[x][y]);
+            (*state)[x][y] = S2048_GET_SBOX((*state)[x][y]);
         }
     }
 }
 
 void s2048_InvCipher(s2048_state_t *state, s2048_state_t *keyBuf)
 {
-    for(uint8_t x = 0; x < S2048_Maximum; ++x) {
-        for(uint8_t y = 0; y < S2048_Maximum; ++y) {
+    register uint8_t x, y;
+    for(x = 0; x < S2048_Maximum; ++x) {
+        for(y = 0; y < S2048_Maximum; ++y) {
+            (*state)[x][y] = S2048_GET_RSBOX((*state)[x][y]);
             (*state)[x][y] = S2048_D((*state)[x][y], (*keyBuf)[x][y]);
         }
     }
@@ -91,14 +105,21 @@ void s2048_cbc_encrypt(s2048_ctx *ctx, uint8_t *buf, size_t size)
     if (size % S2048_BlockSize)
         return;
     
-    size_t r, i, n;
+    register size_t r, i, n;
     uint8_t *buf_ptr = buf;
     for(r = 0; r < S2048_Rounds; ++r) {
-        for(i = 0; i < size; i += S2048_BlockSize, ++n) {
+        for(i = 0, n = 1; i < size; i += S2048_BlockSize, ++n) {
             s2048_Cipher((s2048_state_t *)buf_ptr, (s2048_state_t *)ctx->RK[r]);
             buf_ptr += S2048_BlockSize;
         }
-        buf_ptr -= (r + 1) * (S2048_BlockSize * (n + 1));
+        switch(size) {
+            case S2048_BlockSize:
+                buf_ptr -= S2048_BlockSize;
+                break;
+            default:
+                buf_ptr -= (r + 1) * (S2048_BlockSize * n);
+                break;
+        }
     }
 }
 
@@ -107,14 +128,21 @@ void s2048_cbc_decrypt(s2048_ctx *ctx, uint8_t *buf, size_t size)
     if (size % S2048_BlockSize)
         return;
     
-    size_t r, i, n;
-    uint8_t *buf_ptr = buf;
+    register size_t r, i, n;
+    register uint8_t *buf_ptr = buf;
     for(r = 0; r < S2048_Rounds; ++r) {
         for(i = 0; i < size; i += S2048_BlockSize, ++n) {
             s2048_InvCipher((s2048_state_t *)buf_ptr,
                 (s2048_state_t *)ctx->RK[S2048_Rounds - r - 1]);
             buf_ptr += S2048_BlockSize;
         }
-        buf_ptr -= (r + 1) * (S2048_BlockSize * (n + 1));
+        switch(size) {
+            case S2048_BlockSize:
+                buf_ptr -= S2048_BlockSize;
+                break;
+            default:
+                buf_ptr -= (r + 1) * (S2048_BlockSize * (n + 1));
+                break;
+        }
     }
 }

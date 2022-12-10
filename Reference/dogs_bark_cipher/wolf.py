@@ -70,5 +70,5 @@ class HowlingAnimalsTranslator:
 
 if __name__ == "__main__":
     data = HowlingAnimalsTranslator()
-    res = data.convert("四川省成都市武侯区益州大道.荣盛·布鲁明顿广场-B座")
+    res = data.convert("hello, world")
     print(res)

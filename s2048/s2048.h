@@ -23,4 +23,8 @@ typedef struct {
 } s2048_ctx;
 
 void s2048_init_ctx(s2048_ctx *ctx, uint8_t *key);
+void s2048_cbc_encrypt(s2048_ctx *ctx, uint8_t *buf, size_t size);
+void s2048_cbc_decrypt(s2048_ctx *ctx, uint8_t *buf, size_t size);
+
 #endif // S2048
+

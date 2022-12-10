@@ -117,7 +117,7 @@ void s2048_cbc_encrypt(s2048_ctx *ctx, uint8_t *buf, size_t size)
                 buf_ptr -= S2048_BlockSize;
                 break;
             default:
-                buf_ptr -= (r + 1) * (S2048_BlockSize * n);
+                buf_ptr -= S2048_BlockSize * n;
                 break;
         }
     }

@@ -1,6 +1,6 @@
 #ifndef __SN_CRYPTO__ // snCrypto
 #define __SN_CRYPTO__
-#include <stdlib.h>
+#include <stdint.h>
 #include "../swap.h"
 #include "../random/random.h"
 

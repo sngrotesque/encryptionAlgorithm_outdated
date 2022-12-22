@@ -22,7 +22,12 @@
 | AES/PCBC/PKCS5Padding     | 32                    | 16                    |
 | AES/PCBC/ISO10126Padding  | 32                    | 16                    |
 
-### 密码学讲解链接
+### 密码学链接
+
+##### 设计标准
+[NIST SP 800-38A](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a-add.pdf)
+
+
 
 ##### 基础
 [加密类型：5种加密算法以及如何选择正确的算法](https://baijiahao.baidu.com/s?id=1667454526325821788)<br>

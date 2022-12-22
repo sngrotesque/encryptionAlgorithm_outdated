@@ -1,9 +1,12 @@
 # 由SN-Grotesque开启并维护的加密算法项目
 ###### Encryption algorithm written by 'SN-Grotesque'
 
-##### v2.0.0 (Beta)
+##### v2.0.1 (Beta)
 | 版本号(Version) | 描述(Description)                                                          |
 | :---            | :---                                                                       |
+| v2.0.1 (Beta)   | 尝试在每轮加解密时更新IV与密钥，避免重复使用同一密钥                       |
+|               * | 将S2048更名为SZQ                                                           |
+|                 | 将默认Block size设置为512位，有三种分组大小分别为512，968，2048位          |
 | v2.0.0 (Beta)   | 添加了s1568算法与qwy256算法                                                |
 |                 | 在snCrypto.h库中添加了sbox与rsbox初始化函数，一个巨大的突破                |
 |                 | 学习AES加密算法CBC模式的思想实现了真正的分组加密                           |

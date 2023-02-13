@@ -409,9 +409,8 @@ snVoid SZQ_CBC_Encrypt(SZQ_ctx *ctx, snByte *buf, snSize_t size)
     size >>= SZQ_BIN_SHIFT;
 
     for(r = 0; r < SZQ_NR; ++r) {
-        for(i = addr = 0; i < size; ++i) {
+        for(i = addr = 0; i < size; ++i, addr = ((i + 1) << SZQ_BIN_SHIFT)) {
             SZQ_Cipher((szqState_t *)(buf + addr), (szqState_t *)ctx->rk[r]);
-            addr = ((i + 1) << SZQ_BIN_SHIFT);
         }
     }
 }
@@ -426,9 +425,8 @@ snVoid SZQ_CBC_Decrypt(SZQ_ctx *ctx, snByte *buf, snSize_t size)
     size >>= SZQ_BIN_SHIFT;
 
     for(r = 0; r < SZQ_NR; ++r) {
-        for(i = addr = 0; i < size; ++i) {
+        for(i = addr = 0; i < size; ++i, addr = ((i + 1) << SZQ_BIN_SHIFT)) {
             SZQ_InvCipher((szqState_t *)(buf + addr), (szqState_t *)ctx->rk[SZQ_NR - r - 1]);
-            addr = ((i + 1) << SZQ_BIN_SHIFT);
         }
     }
 }

@@ -30,27 +30,11 @@
 
 #include "../../bits.h"
 
-// #define SZQ_256
-#define SZQ_512
-
-#define SZQ_NB 8
-
-#if defined(SZQ_256)
-#define SZQ_BLOCKLEN 32  // 256 bit
-#define SZQ_NK 4
-#define SZQ_NR 9
-#elif defined(SZQ_512)
 #define SZQ_BLOCKLEN 64  // 512 bit
 #define SZQ_NK 8
 #define SZQ_NR 11
-#endif
 
-// Number of Binary Shifts
-#if defined(SZQ_256)
-#define SZQ_BIN_SHIFT 5
-#elif defined(SZQ_512)
 #define SZQ_BIN_SHIFT 6
-#endif
 
 #define SZQ_ADD_RK(index, n) ((index + n) % SZQ_BLOCKLEN)
 #define SZQ_SUB_RK(index, n) (((index - n) % SZQ_BLOCKLEN) & 0xff)

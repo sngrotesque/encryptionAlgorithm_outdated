@@ -408,8 +408,6 @@ static void XorWithIv(uint8_t *buf, const uint8_t *Iv)
         buf[i] ^= Iv[i];
 }
 
-#include <stdio.h>
-
 void AES_CBC_encrypt(AES_ctx *ctx, uint8_t *buf, size_t length)
 {
     size_t i;

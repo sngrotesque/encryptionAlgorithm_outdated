@@ -13,6 +13,7 @@ static void sbox_init(uint8_t *sbox)
     uint16_t x;
     uint16_t left;
     uint16_t right;
+    uint8_t swap;
 
     for(x = 0; x < SBOX_BLOCKLEN; ++x)
         sbox[x] = x;
@@ -23,7 +24,9 @@ static void sbox_init(uint8_t *sbox)
                 left  = randint(0, SBOX_BLOCKLEN - 1);
                 right = randint(0, SBOX_BLOCKLEN - 1);
             } while(left == right);
-            snSwap_u8(&sbox[left], &sbox[right]);
+            swap = sbox[left];
+            sbox[left] = sbox[right];
+            sbox[right] = swap;
         }
     }
 }

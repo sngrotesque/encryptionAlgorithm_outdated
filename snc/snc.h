@@ -5,7 +5,7 @@
 
 // #define SNC_256 // 32 Bytes
 // #define SNC_512 // 64 Bytes
-// #define SNC_768 // 96 Bytes
+#define SNC_768 // 96 Bytes
 
 #define SNC_BLOCKLEN 32
 
@@ -23,12 +23,20 @@
 #define SNC_KEYLEN 32
 #endif
 
-#define SNC_CIPHER_XOR(x, y) (x ^= y) // 加解密块中的异或函数
+#ifndef bitSwitch
+#define bitSwitch(x) (((x & 0x0f) << 4) ^ (x >> 4))
+#endif
 
 typedef snByte sncState_t[SNC_NB][SNC_NK];
 typedef struct {
     snByte iv[SNC_BLOCKLEN];
-    snByte rk[SNC_NR][SNC_BLOCKLEN];
+    snByte rk[SNC_NR][SNC_KEYLEN];
 } SNC_ctx;
+
+snVoid SNC_init_ctx(SNC_ctx *ctx, const snByte *keyBuf);
+snVoid SNC_ECB_Encrypt(SNC_ctx *ctx, snByte *buf, snSize_t size);
+snVoid SNC_ECB_Decrypt(SNC_ctx *ctx, snByte *buf, snSize_t size);
+
+
 
 #endif

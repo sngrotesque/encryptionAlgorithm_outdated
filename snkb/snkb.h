@@ -8,19 +8,7 @@
 * SK = X（1 < SK < L，且PK*SK % L = 1）
 * C = M^PK % N
 * M = C^SK % N
-// * 前期snkb公钥密码算法思路【暂时弃用】
-// * 公钥常数pkn为随意一个4位数字
-// * 由此常数求出公钥：
-// *     pk = (pkn * (256 ** 24)) ^ (pkn ** 16)
-// * 加解密公式：
-// *     c = m*pk mod N mod 256
-// *     m = c*sk mod N mod 256
-// *
-// * #define SNKB_F(x) (snByte)((x + (((x - 1) & (x << 4) & (x >> 2)) + (x * 2 - 17))) + 4)
-// * #define GetPK(pkn) (double)((pkn * pow(256, 24)) ^ pow(pkn, 16))
-*/
 
-/*
 * 目前为了安全着想，请勿用此加密算法加密超过此长度的数据
 *     SNKB_BLOCKLEN * 2（单位：字节 Bytes）
 *

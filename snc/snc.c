@@ -231,8 +231,10 @@ static snVoid SNC_InvColumnShift(sncState_t *state)
 
 static snVoid SNC_XorWithIV(sncState_t *buf, sncState_t *iv)
 {
+    /*
+    * 此函数留做CBC模式使用
+    */
     register sn_u32 i;
-
     for(i = 0; i < SNC_NK; ++i) {
         (*buf)[0][i] = (*iv)[0][i];
         (*buf)[1][i] = (*iv)[1][i];
@@ -247,8 +249,10 @@ static snVoid SNC_XorWithIV(sncState_t *buf, sncState_t *iv)
 
 static snVoid SNC_BitSwitch(sncState_t *state)
 {
+    /*
+    * 此函数留做CTR模式使用
+    */
     register sn_u32 i;
-
     for(i = 0; i < SNC_NK; ++i) {
         (*state)[0][i] = bitSwitch((*state)[0][i]);
         (*state)[1][i] = bitSwitch((*state)[1][i]);

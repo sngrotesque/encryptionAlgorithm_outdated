@@ -280,33 +280,28 @@ static snVoid SNC_Cipher(sncState_t *state, sncState_t *RoundKey)
         (*state)[5][i] ^= (*RoundKey)[5][i];
         (*state)[6][i] ^= (*RoundKey)[6][i];
         (*state)[7][i] ^= (*RoundKey)[7][i];
-    }
-
 #if defined(SNC_512) || defined(SNC_768)
-    for(i = 4; i < 8; ++i) {
-        (*state)[0][i] ^= (*RoundKey)[0][i];
-        (*state)[1][i] ^= (*RoundKey)[1][i];
-        (*state)[2][i] ^= (*RoundKey)[2][i];
-        (*state)[3][i] ^= (*RoundKey)[3][i];
-        (*state)[4][i] ^= (*RoundKey)[4][i];
-        (*state)[5][i] ^= (*RoundKey)[5][i];
-        (*state)[6][i] ^= (*RoundKey)[6][i];
-        (*state)[7][i] ^= (*RoundKey)[7][i];
-    }
+        (*state)[0][i] ^= (*RoundKey)[0][i + 4];
+        (*state)[1][i] ^= (*RoundKey)[1][i + 4];
+        (*state)[2][i] ^= (*RoundKey)[2][i + 4];
+        (*state)[3][i] ^= (*RoundKey)[3][i + 4];
+        (*state)[4][i] ^= (*RoundKey)[4][i + 4];
+        (*state)[5][i] ^= (*RoundKey)[5][i + 4];
+        (*state)[6][i] ^= (*RoundKey)[6][i + 4];
+        (*state)[7][i] ^= (*RoundKey)[7][i + 4];
 #endif // #if defined(SNC_512) || defined(SNC_768)
-
 #if defined(SNC_768)
-    for(i = 8; i < 12; ++i) {
-        (*state)[0][i] ^= (*RoundKey)[0][i];
-        (*state)[1][i] ^= (*RoundKey)[1][i];
-        (*state)[2][i] ^= (*RoundKey)[2][i];
-        (*state)[3][i] ^= (*RoundKey)[3][i];
-        (*state)[4][i] ^= (*RoundKey)[4][i];
-        (*state)[5][i] ^= (*RoundKey)[5][i];
-        (*state)[6][i] ^= (*RoundKey)[6][i];
-        (*state)[7][i] ^= (*RoundKey)[7][i];
-    }
+        (*state)[0][i] ^= (*RoundKey)[0][i + 8];
+        (*state)[1][i] ^= (*RoundKey)[1][i + 8];
+        (*state)[2][i] ^= (*RoundKey)[2][i + 8];
+        (*state)[3][i] ^= (*RoundKey)[3][i + 8];
+        (*state)[4][i] ^= (*RoundKey)[4][i + 8];
+        (*state)[5][i] ^= (*RoundKey)[5][i + 8];
+        (*state)[6][i] ^= (*RoundKey)[6][i + 8];
+        (*state)[7][i] ^= (*RoundKey)[7][i + 8];
 #endif // #if defined(SNC_768)
+    }
+
 
     SNC_RowsMix(state);
     SNC_ColumnShift(state);
@@ -319,33 +314,27 @@ static snVoid SNC_InvCipher(sncState_t *state, sncState_t *RoundKey)
     SNC_InvColumnShift(state);
     SNC_InvRowsMix(state);
 
-#if defined(SNC_768)
-    for(i = 8; i < 12; ++i) {
-        (*state)[0][i] ^= (*RoundKey)[0][i];
-        (*state)[1][i] ^= (*RoundKey)[1][i];
-        (*state)[2][i] ^= (*RoundKey)[2][i];
-        (*state)[3][i] ^= (*RoundKey)[3][i];
-        (*state)[4][i] ^= (*RoundKey)[4][i];
-        (*state)[5][i] ^= (*RoundKey)[5][i];
-        (*state)[6][i] ^= (*RoundKey)[6][i];
-        (*state)[7][i] ^= (*RoundKey)[7][i];
-    }
-#endif // #if defined(SNC_768)
-
-#if defined(SNC_512) || defined(SNC_768)
-    for(i = 4; i < 8; ++i) {
-        (*state)[0][i] ^= (*RoundKey)[0][i];
-        (*state)[1][i] ^= (*RoundKey)[1][i];
-        (*state)[2][i] ^= (*RoundKey)[2][i];
-        (*state)[3][i] ^= (*RoundKey)[3][i];
-        (*state)[4][i] ^= (*RoundKey)[4][i];
-        (*state)[5][i] ^= (*RoundKey)[5][i];
-        (*state)[6][i] ^= (*RoundKey)[6][i];
-        (*state)[7][i] ^= (*RoundKey)[7][i];
-    }
-#endif // #if defined(SNC_512) || defined(SNC_768)
-
     for(i = 0; i < SNC_NK; ++i) {
+#if defined(SNC_768)
+        (*state)[0][i] ^= (*RoundKey)[0][i + 8];
+        (*state)[1][i] ^= (*RoundKey)[1][i + 8];
+        (*state)[2][i] ^= (*RoundKey)[2][i + 8];
+        (*state)[3][i] ^= (*RoundKey)[3][i + 8];
+        (*state)[4][i] ^= (*RoundKey)[4][i + 8];
+        (*state)[5][i] ^= (*RoundKey)[5][i + 8];
+        (*state)[6][i] ^= (*RoundKey)[6][i + 8];
+        (*state)[7][i] ^= (*RoundKey)[7][i + 8];
+#endif // #if defined(SNC_768)
+#if defined(SNC_512) || defined(SNC_768)
+        (*state)[0][i] ^= (*RoundKey)[0][i + 4];
+        (*state)[1][i] ^= (*RoundKey)[1][i + 4];
+        (*state)[2][i] ^= (*RoundKey)[2][i + 4];
+        (*state)[3][i] ^= (*RoundKey)[3][i + 4];
+        (*state)[4][i] ^= (*RoundKey)[4][i + 4];
+        (*state)[5][i] ^= (*RoundKey)[5][i + 4];
+        (*state)[6][i] ^= (*RoundKey)[6][i + 4];
+        (*state)[7][i] ^= (*RoundKey)[7][i + 4];
+#endif // #if defined(SNC_512) || defined(SNC_768)
         (*state)[0][i] ^= (*RoundKey)[0][i];
         (*state)[1][i] ^= (*RoundKey)[1][i];
         (*state)[2][i] ^= (*RoundKey)[2][i];
@@ -379,14 +368,14 @@ snVoid SNC_ECB_Encrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
 {
     register snSize_t r;
     register snSize_t i;
-    register snSize_t addr;
+
+    sncState_t *bufState = (sncState_t *)buf;
 
     size /= SNC_BLOCKLEN;
 
     for(r = 0; r < SNC_NR; ++r) {
-        for(i = addr = 0; i < size; ++i) {
-            SNC_Cipher((sncState_t *)(buf + addr), (sncState_t *)ctx->rk[r]);
-            addr = ((i + 1) * SNC_BLOCKLEN);
+        for(i = 0; i < size; ++i) {
+            SNC_Cipher((bufState + i), (sncState_t *)ctx->rk[r]);
         }
     }
 }
@@ -395,14 +384,14 @@ snVoid SNC_ECB_Decrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
 {
     register snSize_t r;
     register snSize_t i;
-    register snSize_t addr;
+
+    sncState_t *bufState = (sncState_t *)buf;
 
     size /= SNC_BLOCKLEN;
 
     for(r = 0; r < SNC_NR; ++r) {
-        for(i = addr = 0; i < size; ++i) {
-            SNC_InvCipher((sncState_t *)(buf + addr), (sncState_t *)ctx->rk[SNC_NR - r - 1]);
-            addr = ((i + 1) * SNC_BLOCKLEN);
+        for(i = 0; i < size; ++i) {
+            SNC_InvCipher((bufState + i), (sncState_t *)ctx->rk[SNC_NR - r - 1]);
         }
     }
 }

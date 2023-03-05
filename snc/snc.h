@@ -36,7 +36,7 @@ typedef struct {
 snVoid SNC_init_ctx(SNC_ctx *ctx, const snByte *keyBuf);
 snVoid SNC_ECB_Encrypt(SNC_ctx *ctx, snByte *buf, snSize_t size);
 snVoid SNC_ECB_Decrypt(SNC_ctx *ctx, snByte *buf, snSize_t size);
-
-
+snVoid SNC_CBC_Encrypt(SNC_ctx *ctx, snByte *buf, snSize_t size);
+snVoid SNC_CBC_Decrypt(SNC_ctx *ctx, snByte *buf, snSize_t size);
 
 #endif

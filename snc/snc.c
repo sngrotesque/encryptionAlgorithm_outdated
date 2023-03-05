@@ -46,7 +46,6 @@ static const snByte SNC_rsbox[256] = {
 //*-----------------------Private Function--------------------------------*//
 static snVoid SNC_keyExtension(snByte *iv, snByte *key)
 {
-    // 密钥扩展
     static snSize_t i;
     static snByte buf;
 
@@ -99,7 +98,6 @@ static snVoid SNC_keyExtension(snByte *iv, snByte *key)
 
 static snVoid SNC_SubBytes(sncState_t *state)
 {
-    // 字节置换
     register sn_u32 i;
 
     for(i = 0; i < SNC_NK; ++i) {
@@ -116,7 +114,6 @@ static snVoid SNC_SubBytes(sncState_t *state)
 
 static snVoid SNC_InvSubBytes(sncState_t *state)
 {
-    // 逆字节置换
     register sn_u32 i;
 
     for(i = 0; i < SNC_NK; ++i) {
@@ -136,7 +133,6 @@ static snVoid SNC_InvSubBytes(sncState_t *state)
 
 static snVoid SNC_RowsMix(sncState_t *state)
 {
-    // 行混合
     register sn_u32 i;
 
     for(i = 0; i < SNC_NB; ++i) {
@@ -153,7 +149,6 @@ static snVoid SNC_RowsMix(sncState_t *state)
 
 static snVoid SNC_InvRowsMix(sncState_t *state)
 {
-    // 逆行混合
     register sn_u32 i;
 
     for(i = 0; i < SNC_NB; ++i) {
@@ -170,7 +165,6 @@ static snVoid SNC_InvRowsMix(sncState_t *state)
 
 static snVoid SNC_ColumnShift(sncState_t *state)
 {
-    // 列移位
     static snByte buf;
 
     buf = (*state)[0][0];
@@ -201,7 +195,6 @@ static snVoid SNC_ColumnShift(sncState_t *state)
 
 static snVoid SNC_InvColumnShift(sncState_t *state)
 {
-    // 逆列移位
     static snByte buf;
 
     buf = (*state)[7][3]; (*state)[7][3] = (*state)[3][3]; (*state)[3][3] = buf;
@@ -231,27 +224,21 @@ static snVoid SNC_InvColumnShift(sncState_t *state)
 
 static snVoid SNC_XorWithIV(sncState_t *buf, sncState_t *iv)
 {
-    /*
-    * 此函数留做CBC模式使用
-    */
     register sn_u32 i;
     for(i = 0; i < SNC_NK; ++i) {
-        (*buf)[0][i] = (*iv)[0][i];
-        (*buf)[1][i] = (*iv)[1][i];
-        (*buf)[2][i] = (*iv)[2][i];
-        (*buf)[3][i] = (*iv)[3][i];
-        (*buf)[4][i] = (*iv)[4][i];
-        (*buf)[5][i] = (*iv)[5][i];
-        (*buf)[6][i] = (*iv)[6][i];
-        (*buf)[7][i] = (*iv)[7][i];
+        (*buf)[0][i] ^= (*iv)[0][i];
+        (*buf)[1][i] ^= (*iv)[1][i];
+        (*buf)[2][i] ^= (*iv)[2][i];
+        (*buf)[3][i] ^= (*iv)[3][i];
+        (*buf)[4][i] ^= (*iv)[4][i];
+        (*buf)[5][i] ^= (*iv)[5][i];
+        (*buf)[6][i] ^= (*iv)[6][i];
+        (*buf)[7][i] ^= (*iv)[7][i];
     }
 }
 
 static snVoid SNC_BitSwitch(sncState_t *state)
 {
-    /*
-    * 此函数留做CTR模式使用
-    */
     register sn_u32 i;
     for(i = 0; i < SNC_NK; ++i) {
         (*state)[0][i] = bitSwitch((*state)[0][i]);
@@ -396,4 +383,39 @@ snVoid SNC_ECB_Decrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
     }
 }
 
+snVoid SNC_CBC_Encrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
+{
+    sncState_t *bufState = (sncState_t *)buf;
+    sncState_t *ivState = (sncState_t *)ctx->iv;
+    register snSize_t r;
+    register snSize_t i;
+
+    size /= SNC_BLOCKLEN;
+
+    for(r = 0; r < SNC_NR; ++r) {
+        for(i = 0; i < size; ++i) {
+            SNC_XorWithIV((bufState + i), ivState);
+            SNC_Cipher((bufState + i), (sncState_t *)ctx->rk[r]);
+            ivState = (bufState + i);
+        }
+    }
+}
+
+snVoid SNC_CBC_Decrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
+{
+    sncState_t *bufState = (sncState_t *)buf;
+    sncState_t *ivState = snNull;
+    register snSize_t r;
+    register snSize_t i;
+
+    size /= SNC_BLOCKLEN;
+
+    for(r = 0; r < SNC_NR; ++r) {
+        for(i = 0; i < size; ++i) {
+            ivState = (bufState + i);
+            SNC_InvCipher((bufState + i), (sncState_t *)ctx->rk[SNC_NR - r - 1]);
+            SNC_XorWithIV((bufState + i), ivState);
+        }
+    }
+}
 

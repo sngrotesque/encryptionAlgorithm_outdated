@@ -1,62 +1,31 @@
-### SNC (中文描述)
+### Chinese
 ```text
-这是一个对称分组加密算法（SN Crypto）
-固定区块长度为256位，也就是32字节。
-密钥长度分为三种：
-    1. 32字节（256位）
-    2. 64字节（512位）
-    3. 96字节（768位）
-
-此算法的加密过程是这样的：
-    1. 将明文分为对应个数的区块，每个区块为32字节大小，也就是4x8的矩阵
-    2. 将每个矩阵进行字节置换，列移位，行混合操作。
-    3. 使用加密函数将数据与轮密钥进行异或。
-    4. 得到密文。
-
-    其中，轮密钥是通过最开始的密钥生成而来，且具有良好的雪崩效应。
-    并且跟其他类似的加密算法（如AES）不同的是，IV不仅会用于加密明文，还会直接作用在轮密钥中。
-    因为轮密钥中每一个子密钥都是有IV参与。
-
-此算法的解密过程是加密过程的逆运算：
-    但要注意的是，密钥从最后一轮开始使用直到第一轮子密钥。
-
-目前支持ECB模式加密
+SNC是由SN-Grotesque开发的对称分组加密算法，是一种采用了Feistel与SPN两种结构的加密算法。
+它的区块长度为32字节，也就是256位。
+采用三种密钥长度来支持不同场景的加密与解密，分别是：
+    32字节（对应9轮加密）
+    64字节（对应11轮加密）
+    96字节（对应13轮加密）
+目前有ECB，CBC两种加密模式。
+------------------------------------------------------------------------------------
+SNKB是由SN-Grotesque开发的公钥分组密码算法，是一种参考了SPN结构的非对称加密算法。
+它的区块长度为128字节，也就是1024位。
+公钥与私钥为128个0~65536之间的数字。
+加密过程类似于RSA，但不完全相同，具体的讲解请等待此算法研发完成。
 ```
 
-### SNKB (中文描述)
+### English
 ```text
-这是一个公钥密码算法（SN kilobyte）
-
-具体描述，请等下次
-```
-
-### SNC (English description)
-```text
-This is a symmetric packet encryption algorithm (SN Crypto)
-The fixed block length is 256 bits, which is 32 bytes.
-There are three key lengths:
-    1. 32 bytes (256 bits)
-    2. 64 bytes (512 bits)
-    3. 96 bytes (768 bits)
-
-The encryption process of this algorithm is as follows:
-    1. Divide the clear text into blocks with corresponding number, and each block is 32 bytes in size, which is a 4x8 matrix
-    2. Perform byte replacement, column shift and row mixing operations for each matrix.
-    3. Use the encryption function to XOR the data and the round key.
-    4. Get the ciphertext.
-
-    The round key is generated from the first key and has good avalanche effect.
-    And unlike other similar encryption algorithms (such as AES), IV is not only used to encrypt plaintext, but also directly used in the round key.
-    Because each sub-key in the round key has IV participation.
-
-The decryption process of this algorithm is the inverse operation of the encryption process:
-    However, it should be noted that the key is used from the last round to the first round.
-
-Currently supports encryption in ECB mode
-```
-
-### SNKB (English description)
-```text
-This is a public key cryptography algorithm (SN kilobyte)
-Specific description, please wait next time.
+SNC is a symmetric packet encryption algorithm developed by SN-Grotesque. It is an encryption algorithm that uses Feistel and SPN structures.
+Its block length is 32 bytes, which is 256 bits.
+Three key lengths are used to support encryption and decryption in different scenarios, respectively:
+    32 bytes (corresponding to 9 rounds of encryption)
+    64 bytes (corresponding to 11 rounds of encryption)
+    96 bytes (corresponding to 13 rounds of encryption)
+At present, there are two encryption modes: ECB and CBC.
+------------------------------------------------------------------------------------
+SNKB is a public key block cipher algorithm developed by SN-Grotesque, which is an asymmetric encryption algorithm with reference to SPN structure.
+Its block length is 128 bytes, which is 1024 bits.
+The public key and private key are 128 numbers between 0 and 65536.
+The encryption process is similar to RSA, but not completely the same. Please wait until the development of this algorithm is completed.
 ```

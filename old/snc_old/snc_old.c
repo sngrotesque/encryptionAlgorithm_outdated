@@ -306,9 +306,9 @@ static snVoid SNC_keyExtension(SNC_ctx *ctx, snByte *key)
         ctx->iv[SNC_SUB_RK(i, 47)] ^= buf;
 
         buf = buf ^ key[SNC_BLOCKLEN - 1];
-        buf = bitSwitch(buf);
+        buf = bitSwap(buf);
         buf = SNC_GET_SBOX(buf);
-        buf = bitSwitch(buf);
+        buf = bitSwap(buf);
         buf ^= 0xff;
 
         key[SNC_ADD_RK(i, 7)]  = (buf ^ key[SNC_ADD_RK(i, 7)])  + i;

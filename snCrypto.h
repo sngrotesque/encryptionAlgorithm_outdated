@@ -1,8 +1,8 @@
 #ifndef __SN_CRYPTO__ // snCrypto
 #define __SN_CRYPTO__
 #include <stdint.h>
-#include "../bits.h"
-#include "../random/random.h"
+#include <snBits.h>
+#include <snRand.h>
 
 #define SBOX_BLOCKLEN 256
 

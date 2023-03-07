@@ -116,13 +116,13 @@ snVoid snkb_encrypt(snkb_ctx *ctx, snByte *buf, snSize_t bufSize)
 
     for(i = 0; i < size; ++i) {
         buf[i] = GetSboxValue(buf[i]);
-        buf[i] = bitSwitch(buf[i]);
+        buf[i] = bitSwap(buf[i]);
 
         buf[i] = GetSboxValue(buf[i]);
-        buf[i] = bitSwitch(buf[i]);
+        buf[i] = bitSwap(buf[i]);
 
         buf[i] = GetSboxValue(buf[i]);
-        buf[i] = bitSwitch(buf[i]);
+        buf[i] = bitSwap(buf[i]);
     }
 
     for(i = ki = 0; i < size; i += 2, ++ki) {
@@ -134,13 +134,13 @@ snVoid snkb_encrypt(snkb_ctx *ctx, snByte *buf, snSize_t bufSize)
 
     for(i = 0; i < size; ++i) {
         buf[i] = GetSboxValue(buf[i]);
-        buf[i] = bitSwitch(buf[i]);
+        buf[i] = bitSwap(buf[i]);
 
         buf[i] = GetSboxValue(buf[i]);
-        buf[i] = bitSwitch(buf[i]);
+        buf[i] = bitSwap(buf[i]);
 
         buf[i] = GetRsboxValue(buf[i]);
-        buf[i] = bitSwitch(buf[i]);
+        buf[i] = bitSwap(buf[i]);
     }
 }
 
@@ -154,13 +154,13 @@ snVoid snkb_decrypt(snkb_ctx *ctx, snByte *buf, snSize_t bufSize)
     size = bufSize;
 
     for(i = 0; i < size; ++i) {
-        buf[i] = bitSwitch(buf[i]);
+        buf[i] = bitSwap(buf[i]);
         buf[i] = GetSboxValue(buf[i]);
 
-        buf[i] = bitSwitch(buf[i]);
+        buf[i] = bitSwap(buf[i]);
         buf[i] = GetRsboxValue(buf[i]);
 
-        buf[i] = bitSwitch(buf[i]);
+        buf[i] = bitSwap(buf[i]);
         buf[i] = GetRsboxValue(buf[i]);
     }
 
@@ -172,13 +172,13 @@ snVoid snkb_decrypt(snkb_ctx *ctx, snByte *buf, snSize_t bufSize)
     }
 
     for(i = 0; i < size; ++i) {
-        buf[i] = bitSwitch(buf[i]);
+        buf[i] = bitSwap(buf[i]);
         buf[i] = GetRsboxValue(buf[i]);
 
-        buf[i] = bitSwitch(buf[i]);
+        buf[i] = bitSwap(buf[i]);
         buf[i] = GetRsboxValue(buf[i]);
 
-        buf[i] = bitSwitch(buf[i]);
+        buf[i] = bitSwap(buf[i]);
         buf[i] = GetRsboxValue(buf[i]);
     }
 

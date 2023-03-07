@@ -237,18 +237,18 @@ static snVoid SNC_XorWithIV(sncState_t *buf, sncState_t *iv)
     }
 }
 
-static snVoid SNC_BitSwitch(sncState_t *state)
+static snVoid SNC_BitSwap(sncState_t *state)
 {
     register sn_u32 i;
     for(i = 0; i < SNC_NK; ++i) {
-        (*state)[0][i] = bitSwitch((*state)[0][i]);
-        (*state)[1][i] = bitSwitch((*state)[1][i]);
-        (*state)[2][i] = bitSwitch((*state)[2][i]);
-        (*state)[3][i] = bitSwitch((*state)[3][i]);
-        (*state)[4][i] = bitSwitch((*state)[4][i]);
-        (*state)[5][i] = bitSwitch((*state)[5][i]);
-        (*state)[6][i] = bitSwitch((*state)[6][i]);
-        (*state)[7][i] = bitSwitch((*state)[7][i]);
+        (*state)[0][i] = bitSwap((*state)[0][i]);
+        (*state)[1][i] = bitSwap((*state)[1][i]);
+        (*state)[2][i] = bitSwap((*state)[2][i]);
+        (*state)[3][i] = bitSwap((*state)[3][i]);
+        (*state)[4][i] = bitSwap((*state)[4][i]);
+        (*state)[5][i] = bitSwap((*state)[5][i]);
+        (*state)[6][i] = bitSwap((*state)[6][i]);
+        (*state)[7][i] = bitSwap((*state)[7][i]);
     }
 }
 

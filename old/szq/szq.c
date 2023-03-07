@@ -350,9 +350,9 @@ static void SZQ_keyExtension(SZQ_ctx *ctx, uint8_t *key)
         ctx->iv[SZQ_SUB_RK(i, 47)] ^= buf;
 
         buf = buf ^ key[SZQ_BLOCKLEN - 1];
-        buf = bitSwitch(buf);
+        buf = bitSwap(buf);
         buf = SZQ_GET_SBOX(buf);
-        buf = bitSwitch(buf);
+        buf = bitSwap(buf);
         buf ^= 0xff;
 
         key[SZQ_ADD_RK(i, 7)]  = (buf ^ key[SZQ_ADD_RK(i, 7)])  + i;

@@ -458,6 +458,7 @@ snVoid SNC_CBC_Encrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
 }
 
 // CBC模式解密
+// 我干你妈，解密不了啊
 snVoid SNC_CBC_Decrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
 {
     register snSize_t r;

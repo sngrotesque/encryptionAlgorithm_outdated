@@ -1,5 +1,6 @@
 #include "snc.h"
 
+// 用于置换明文块的置换盒
 static const snByte SNC_sbox[256] = {
     // 0     1     2     3     4     5     6     7     8     9     A     B     C     D     E     F
     0x25, 0xd1, 0x84, 0xb8, 0x48, 0x35, 0x4a, 0x78, 0x79, 0x74, 0x60, 0xc7, 0x0e, 0xbc, 0x32, 0x30,
@@ -20,6 +21,7 @@ static const snByte SNC_sbox[256] = {
     0x55, 0x70, 0xf3, 0x62, 0x92, 0x56, 0x6d, 0x15, 0x2a, 0x61, 0xcd, 0x99, 0x7c, 0xf1, 0xd7, 0x07
 };
 
+// 用于将通过置换盒的数据还原的逆置换盒
 static const snByte SNC_rsbox[256] = {
     // 0     1     2     3     4     5     6     7     8     9     A     B     C     D     E     F
     0xee, 0x47, 0xbf, 0xb1, 0x3e, 0x91, 0x9f, 0xff, 0x94, 0xe4, 0x56, 0x6d, 0x92, 0x76, 0x0c, 0x98,
@@ -40,16 +42,19 @@ static const snByte SNC_rsbox[256] = {
     0x52, 0xfd, 0x54, 0xf2, 0x3a, 0x77, 0x21, 0xc8, 0xd1, 0x1e, 0x84, 0xd5, 0x51, 0xc4, 0xab, 0x6b
 };
 
+// 使用宏定义更好的使用置换盒与逆置换盒
 #define SNC_SBOX(x)  (SNC_sbox[(x)])
 #define SNC_RSBOX(x) (SNC_rsbox[(x)])
 
 //*-----------------------Private Function--------------------------------*//
+// 密钥混淆加密扩展函数，用于将密钥的每一轮进行打乱并赋值到轮密钥中
 static snVoid SNC_keyExtension(snByte *iv, snByte *key)
 {
     static snSize_t i;
     static snByte buf;
 
     for(i = 0; i < SNC_KEYLEN; ++i) {
+        // 这种多元素异或是根据多未知数的无数解特性保证安全
         buf = 
             key[i]                     ^ key[(i + 1)  % SNC_KEYLEN] ^
             key[(i + 4)  % SNC_KEYLEN] ^ key[(i + 5)  % SNC_KEYLEN] ^
@@ -61,6 +66,7 @@ static snVoid SNC_keyExtension(snByte *iv, snByte *key)
             key[(i + 28) % SNC_KEYLEN] ^ key[(i + 29) % SNC_KEYLEN] ^
             iv[(i + 7) % SNC_BLOCKLEN] ^ iv[(i + 16) % SNC_BLOCKLEN];
 
+        // 将初始向量异或刚刚混淆的值，用于将初始向量混淆与加密
         iv[i % SNC_BLOCKLEN] ^= buf;
 
         buf = 
@@ -76,6 +82,7 @@ static snVoid SNC_keyExtension(snByte *iv, snByte *key)
 
         iv[(i + 17) % SNC_BLOCKLEN] ^= buf;
 
+        // 使用混淆整个密钥块的方式将密钥更新
         key[(i + 7)  % SNC_KEYLEN] = (buf ^ key[(i + 7)  % SNC_KEYLEN]) ^ (SNC_KEYLEN % (i + 1));
         key[(i + 14) % SNC_KEYLEN] = (buf ^ key[(i + 14) % SNC_KEYLEN]) + (SNC_KEYLEN % (i + 1));
         key[(i + 21) % SNC_KEYLEN] = (buf ^ key[(i + 21) % SNC_KEYLEN]) + (SNC_KEYLEN % (i + 1));
@@ -91,16 +98,17 @@ static snVoid SNC_keyExtension(snByte *iv, snByte *key)
         key[(i + 79) % SNC_KEYLEN] = (buf ^ key[(i + 79) % SNC_KEYLEN]) + (SNC_KEYLEN % (i + 1));
         key[(i + 85) % SNC_KEYLEN] = (buf ^ key[(i + 85) % SNC_KEYLEN]) + (SNC_KEYLEN % (i + 1));
         key[(i + 92) % SNC_KEYLEN] = (buf ^ key[(i + 92) % SNC_KEYLEN]) + (SNC_KEYLEN % (i + 1));
-
         key[i] = buf;
     }
 }
 
+// 块置换函数，用于将分组的明文块进行置换
 static snVoid SNC_SubBytes(sncState_t *state)
 {
     register sn_u32 i;
 
     for(i = 0; i < SNC_NK; ++i) {
+        // 按列进行置换
         (*state)[0][i] = SNC_SBOX((*state)[0][i]);
         (*state)[1][i] = SNC_SBOX((*state)[1][i]);
         (*state)[2][i] = SNC_SBOX((*state)[2][i]);
@@ -112,11 +120,13 @@ static snVoid SNC_SubBytes(sncState_t *state)
     }
 }
 
+// 块逆置换函数，用于将分组的密文块进行逆置换
 static snVoid SNC_InvSubBytes(sncState_t *state)
 {
     register sn_u32 i;
 
     for(i = 0; i < SNC_NK; ++i) {
+        // 按列进行逆置换
         (*state)[0][i] = SNC_RSBOX((*state)[0][i]);
         (*state)[1][i] = SNC_RSBOX((*state)[1][i]);
         (*state)[2][i] = SNC_RSBOX((*state)[2][i]);
@@ -128,14 +138,17 @@ static snVoid SNC_InvSubBytes(sncState_t *state)
     }
 }
 
+// 用于进行行混合的宏定义
 #define ROWS_MIX_ENCODE(x, y, z, p) (x = ((x ^ y) - z) ^ p)
 #define ROWS_MIX_DECODE(x, y, z, p) (x = ((x ^ p) + z) ^ y)
 
+// 行混合函数，三个明文数据作为未知数与公开的质数进行运算
 static snVoid SNC_RowsMix(sncState_t *state)
 {
     register sn_u32 i;
 
     for(i = 0; i < SNC_NB; ++i) {
+        // 按行进行行混合
         ROWS_MIX_ENCODE((*state)[i][0 % SNC_NK], (*state)[i][3 % SNC_NK], (*state)[i][5 % SNC_NK], 0x07);
         ROWS_MIX_ENCODE((*state)[i][1 % SNC_NK], (*state)[i][4 % SNC_NK], (*state)[i][6 % SNC_NK], 0x0d);
         ROWS_MIX_ENCODE((*state)[i][2 % SNC_NK], (*state)[i][5 % SNC_NK], (*state)[i][7 % SNC_NK], 0x17);
@@ -147,11 +160,13 @@ static snVoid SNC_RowsMix(sncState_t *state)
     }
 }
 
+// 逆行混合函数，三个密文数据作与公开的质数进行运算
 static snVoid SNC_InvRowsMix(sncState_t *state)
 {
     register sn_u32 i;
 
     for(i = 0; i < SNC_NB; ++i) {
+        // 按行进行逆行混合
         ROWS_MIX_DECODE((*state)[i][7 % SNC_NK], (*state)[i][2 % SNC_NK], (*state)[i][4 % SNC_NK], 0x71);
         ROWS_MIX_DECODE((*state)[i][6 % SNC_NK], (*state)[i][1 % SNC_NK], (*state)[i][3 % SNC_NK], 0x61);
         ROWS_MIX_DECODE((*state)[i][5 % SNC_NK], (*state)[i][0 % SNC_NK], (*state)[i][2 % SNC_NK], 0x4f);
@@ -163,51 +178,59 @@ static snVoid SNC_InvRowsMix(sncState_t *state)
     }
 }
 
+// 列移位函数，第一列移位一个元素，第二列移位两个元素，以此类推至第四列
 static snVoid SNC_ColumnShift(sncState_t *state)
 {
     static snByte buf;
 
+    // 第一列
     buf = (*state)[0][0];
     (*state)[0][0] = (*state)[1][0]; (*state)[1][0] = (*state)[2][0];
     (*state)[2][0] = (*state)[3][0]; (*state)[3][0] = (*state)[4][0];
     (*state)[4][0] = (*state)[5][0]; (*state)[5][0] = (*state)[6][0];
     (*state)[6][0] = (*state)[7][0]; (*state)[7][0] = buf;
 
+    // 第二列
     buf = (*state)[0][1];
     (*state)[0][1] = (*state)[2][1]; (*state)[2][1] = (*state)[4][1];
     (*state)[4][1] = (*state)[6][1]; (*state)[6][1] = buf;
-
     buf = (*state)[1][1];
     (*state)[1][1] = (*state)[3][1]; (*state)[3][1] = (*state)[5][1];
     (*state)[5][1] = (*state)[7][1]; (*state)[7][1] = buf;
 
+    // 第三列
     buf = (*state)[0][2];
     (*state)[0][2] = (*state)[3][2]; (*state)[3][2] = (*state)[6][2];
     (*state)[6][2] = (*state)[1][2]; (*state)[1][2] = (*state)[4][2];
     (*state)[4][2] = (*state)[7][2]; (*state)[7][2] = (*state)[2][2];
     (*state)[2][2] = (*state)[5][2]; (*state)[5][2] = buf;
 
+    // 第四列
     buf = (*state)[0][3]; (*state)[0][3] = (*state)[4][3]; (*state)[4][3] = buf;
     buf = (*state)[1][3]; (*state)[1][3] = (*state)[5][3]; (*state)[5][3] = buf;
     buf = (*state)[2][3]; (*state)[2][3] = (*state)[6][3]; (*state)[6][3] = buf;
     buf = (*state)[3][3]; (*state)[3][3] = (*state)[7][3]; (*state)[7][3] = buf;
 }
 
+// 逆列移位函数，第四列移位四个元素，第三列移位三个元素，以此类推至第一列
 static snVoid SNC_InvColumnShift(sncState_t *state)
 {
     static snByte buf;
 
+    // 第四列
     buf = (*state)[7][3]; (*state)[7][3] = (*state)[3][3]; (*state)[3][3] = buf;
     buf = (*state)[6][3]; (*state)[6][3] = (*state)[2][3]; (*state)[2][3] = buf;
     buf = (*state)[5][3]; (*state)[5][3] = (*state)[1][3]; (*state)[1][3] = buf;
     buf = (*state)[4][3]; (*state)[4][3] = (*state)[0][3]; (*state)[0][3] = buf;
 
+    // 第三列
     buf = (*state)[5][2];
     (*state)[5][2] = (*state)[2][2]; (*state)[2][2] = (*state)[7][2];
     (*state)[7][2] = (*state)[4][2]; (*state)[4][2] = (*state)[1][2];
     (*state)[1][2] = (*state)[6][2]; (*state)[6][2] = (*state)[3][2];
     (*state)[3][2] = (*state)[0][2]; (*state)[0][2] = buf;
 
+    // 第二列
     buf = (*state)[7][1];
     (*state)[7][1] = (*state)[5][1]; (*state)[5][1] = (*state)[3][1];
     (*state)[3][1] = (*state)[1][1]; (*state)[1][1] = buf;
@@ -215,6 +238,7 @@ static snVoid SNC_InvColumnShift(sncState_t *state)
     (*state)[6][1] = (*state)[4][1]; (*state)[4][1] = (*state)[2][1];
     (*state)[2][1] = (*state)[0][1];(*state)[0][1] = buf;
 
+    // 第一列
     buf = (*state)[7][0];
     (*state)[7][0] = (*state)[6][0]; (*state)[6][0] = (*state)[5][0];
     (*state)[5][0] = (*state)[4][0]; (*state)[4][0] = (*state)[3][0];
@@ -222,10 +246,12 @@ static snVoid SNC_InvColumnShift(sncState_t *state)
     (*state)[1][0] = (*state)[0][0]; (*state)[0][0] = buf;
 }
 
+// 将明文或密文块与初始向量块异或的函数，用于CBC模式
 static snVoid SNC_XorWithIV(sncState_t *buf, sncState_t *iv)
 {
     register sn_u32 i;
     for(i = 0; i < SNC_NK; ++i) {
+        // 按列异或
         (*buf)[0][i] ^= (*iv)[0][i];
         (*buf)[1][i] ^= (*iv)[1][i];
         (*buf)[2][i] ^= (*iv)[2][i];
@@ -237,10 +263,12 @@ static snVoid SNC_XorWithIV(sncState_t *buf, sncState_t *iv)
     }
 }
 
+// 将块中元素的二进制位交换的函数，如：a7 -> 7a
 static snVoid SNC_BitSwap(sncState_t *state)
 {
     register sn_u32 i;
     for(i = 0; i < SNC_NK; ++i) {
+        // 按列交换
         (*state)[0][i] = bitSwap((*state)[0][i]);
         (*state)[1][i] = bitSwap((*state)[1][i]);
         (*state)[2][i] = bitSwap((*state)[2][i]);
@@ -252,13 +280,16 @@ static snVoid SNC_BitSwap(sncState_t *state)
     }
 }
 
+// 加密块函数，将输入的块进行加密
 static snVoid SNC_Cipher(sncState_t *state, sncState_t *RoundKey)
 {
     register sn_u32 i;
 
+    // 执行块置换函数
     SNC_SubBytes(state);
 
     for(i = 0; i < SNC_NK; ++i) {
+        // 此块为基础加密，也就是使用[0 - 31]字节的密钥进行加密
         (*state)[0][i] ^= (*RoundKey)[0][i];
         (*state)[1][i] ^= (*RoundKey)[1][i];
         (*state)[2][i] ^= (*RoundKey)[2][i];
@@ -268,6 +299,7 @@ static snVoid SNC_Cipher(sncState_t *state, sncState_t *RoundKey)
         (*state)[6][i] ^= (*RoundKey)[6][i];
         (*state)[7][i] ^= (*RoundKey)[7][i];
 #if defined(SNC_512) || defined(SNC_768)
+        // 此块为复合加密，也就是[32 - 63]字节的密钥再次加密
         (*state)[0][i] ^= (*RoundKey)[0][i + 4];
         (*state)[1][i] ^= (*RoundKey)[1][i + 4];
         (*state)[2][i] ^= (*RoundKey)[2][i + 4];
@@ -278,6 +310,7 @@ static snVoid SNC_Cipher(sncState_t *state, sncState_t *RoundKey)
         (*state)[7][i] ^= (*RoundKey)[7][i + 4];
 #endif // #if defined(SNC_512) || defined(SNC_768)
 #if defined(SNC_768)
+        // 此块为复合加密，也就是[64 - 95]字节的密钥再次加密
         (*state)[0][i] ^= (*RoundKey)[0][i + 8];
         (*state)[1][i] ^= (*RoundKey)[1][i + 8];
         (*state)[2][i] ^= (*RoundKey)[2][i + 8];
@@ -289,7 +322,7 @@ static snVoid SNC_Cipher(sncState_t *state, sncState_t *RoundKey)
 #endif // #if defined(SNC_768)
     }
 
-
+    // 执行行混合函数与列移位函数
     SNC_RowsMix(state);
     SNC_ColumnShift(state);
 }
@@ -298,11 +331,13 @@ static snVoid SNC_InvCipher(sncState_t *state, sncState_t *RoundKey)
 {
     register sn_u32 i;
 
+    // 执行逆列移位函数与逆行混合函数
     SNC_InvColumnShift(state);
     SNC_InvRowsMix(state);
 
     for(i = 0; i < SNC_NK; ++i) {
 #if defined(SNC_768)
+        // 此块为复合解密，也就是[64 - 95]字节的密钥解密
         (*state)[0][i] ^= (*RoundKey)[0][i + 8];
         (*state)[1][i] ^= (*RoundKey)[1][i + 8];
         (*state)[2][i] ^= (*RoundKey)[2][i + 8];
@@ -313,6 +348,7 @@ static snVoid SNC_InvCipher(sncState_t *state, sncState_t *RoundKey)
         (*state)[7][i] ^= (*RoundKey)[7][i + 8];
 #endif // #if defined(SNC_768)
 #if defined(SNC_512) || defined(SNC_768)
+        // 此块为复合解密，也就是[32 - 63]字节的密钥再次解密
         (*state)[0][i] ^= (*RoundKey)[0][i + 4];
         (*state)[1][i] ^= (*RoundKey)[1][i + 4];
         (*state)[2][i] ^= (*RoundKey)[2][i + 4];
@@ -322,6 +358,7 @@ static snVoid SNC_InvCipher(sncState_t *state, sncState_t *RoundKey)
         (*state)[6][i] ^= (*RoundKey)[6][i + 4];
         (*state)[7][i] ^= (*RoundKey)[7][i + 4];
 #endif // #if defined(SNC_512) || defined(SNC_768)
+        // 此块为基础解密，也就是使用[0 - 31]字节的密钥进行解密
         (*state)[0][i] ^= (*RoundKey)[0][i];
         (*state)[1][i] ^= (*RoundKey)[1][i];
         (*state)[2][i] ^= (*RoundKey)[2][i];
@@ -332,88 +369,115 @@ static snVoid SNC_InvCipher(sncState_t *state, sncState_t *RoundKey)
         (*state)[7][i] ^= (*RoundKey)[7][i];
     }
 
+    // 执行块逆置换函数
     SNC_InvSubBytes(state);
 }
 
 //*--------------------------Public Function-----------------------------*//
+// 初始化SNC数据结构的函数，用于生成轮密钥
 snVoid SNC_init_ctx(SNC_ctx *ctx, const snByte *keyBuf)
 {
     static sn_u32 r;
-    static snByte key[SNC_KEYLEN];
-    static snByte iv[SNC_BLOCKLEN];
+    static snByte key[SNC_KEYLEN]; // 密钥副本，用于存放每轮的子密钥
+    static snByte iv[SNC_BLOCKLEN]; // 初始向量副本，用于保证输入的初始向量不发生变化
 
     memcpy(key, keyBuf, SNC_KEYLEN);
     memcpy(iv, ctx->iv, SNC_BLOCKLEN);
 
     for(r = 0; r < SNC_NR; ++r) {
+        // 先将密钥（也就是输入的基础密钥）复制到第一轮的子密钥中
+        // 然后在此密钥的基础上对其使用密钥扩展加密混淆函数后复制到对应轮数的子密钥中
+        // 直到最后一轮
         memcpy(ctx->rk[r], key, SNC_KEYLEN);
         SNC_keyExtension(iv, key);
     }
 }
 
+// ECB模式加密，一般来说是不推荐使用ECB模式加密数据的。
 snVoid SNC_ECB_Encrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
 {
     register snSize_t r;
     register snSize_t i;
 
+    // 将SNC的块结构指向输入的数据，用于提高性能和简化代码
     sncState_t *bufState = (sncState_t *)buf;
-
+    // 因为是直接使用块分组进行操作，所以需要将长度除以块的长度
     size /= SNC_BLOCKLEN;
 
     for(r = 0; r < SNC_NR; ++r) {
+        // 每轮使用对应的子密钥进行一次数据的整体加密
         for(i = 0; i < size; ++i) {
             SNC_Cipher((bufState + i), (sncState_t *)ctx->rk[r]);
         }
     }
 }
 
+// ECB模式解密
 snVoid SNC_ECB_Decrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
 {
     register snSize_t r;
     register snSize_t i;
 
+    // 将SNC的块结构指向输入的数据，用于提高性能和简化代码
     sncState_t *bufState = (sncState_t *)buf;
-
+    // 因为是直接使用块分组进行操作，所以需要将长度除以块的长度
     size /= SNC_BLOCKLEN;
 
     for(r = 0; r < SNC_NR; ++r) {
+        // 每轮使用对应的子密钥进行一次数据的整体解密
         for(i = 0; i < size; ++i) {
             SNC_InvCipher((bufState + i), (sncState_t *)ctx->rk[SNC_NR - r - 1]);
         }
     }
 }
 
+// CBC模式加密
 snVoid SNC_CBC_Encrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
 {
-    sncState_t *bufState = (sncState_t *)buf;
-    sncState_t *ivState = (sncState_t *)ctx->iv;
     register snSize_t r;
     register snSize_t i;
 
+    // 将SNC的块结构指向输入的数据，用于提高性能和简化代码
+    sncState_t *bufState = (sncState_t *)buf;
+    // 将SNC的块结构指向初始向量，用于提高性能和简化代码
+    sncState_t *ivState = (sncState_t *)ctx->iv;
+    // 因为是直接使用块分组进行操作，所以需要将长度除以块的长度
     size /= SNC_BLOCKLEN;
 
     for(r = 0; r < SNC_NR; ++r) {
+        // 每轮使用对应的子密钥进行一次数据的整体加密
         for(i = 0; i < size; ++i) {
+            // 将输入块与初始向量进行一次异或
             SNC_XorWithIV((bufState + i), ivState);
+            // 加密此块
             SNC_Cipher((bufState + i), (sncState_t *)ctx->rk[r]);
+            // 将初始向量块的指针指向被加密的这个块用于下一个块的加密
             ivState = (bufState + i);
         }
     }
 }
 
+// CBC模式解密
 snVoid SNC_CBC_Decrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
 {
-    sncState_t *bufState = (sncState_t *)buf;
-    sncState_t *ivState = snNull;
     register snSize_t r;
     register snSize_t i;
 
+    // 将SNC的块结构指向输入的数据，用于提高性能和简化代码
+    sncState_t *bufState = (sncState_t *)buf;
+    // 将SNC的块结构指向空指针，用于一会指向密文块与提高性能和简化代码
+    sncState_t *ivState = snNull;
+    // 因为是直接使用块分组进行操作，所以需要将长度除以块的长度
     size /= SNC_BLOCKLEN;
 
     for(r = 0; r < SNC_NR; ++r) {
+        // 每轮使用对应的子密钥进行一次数据的整体解密
         for(i = 0; i < size; ++i) {
+            // 将初始向量块的指针指向块用于解密
             ivState = (bufState + i);
+            // 解密此块
             SNC_InvCipher((bufState + i), (sncState_t *)ctx->rk[SNC_NR - r - 1]);
+            // 将输入块与初始向量进行一次异或
             SNC_XorWithIV((bufState + i), ivState);
         }
     }

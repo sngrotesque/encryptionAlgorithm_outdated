@@ -45,14 +45,14 @@
 #ifndef __SNKB_H__
 #define __SNKB_H__
 
-#include "../../bits.h"
-#include "../../error.h"
-#include "../../random/random.h"
+#include <snBits.h>
+#include <snError.h>
+#include <snRand.h>
 
 #define ENABLE_KEY_PROCESS 0
 
 #if defined(ENABLE_KEY_PROCESS) && (ENABLE_KEY_PROCESS == 1)
-#include "../../keyProcess.h"
+#include <snKey.h>
 #endif
 
 #define SNKB_BLOCKLEN 128

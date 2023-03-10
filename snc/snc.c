@@ -437,49 +437,36 @@ snVoid SNC_CBC_Encrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
     register snSize_t r;
     register snSize_t i;
 
-    // 将SNC的块结构指向输入的数据，用于提高性能和简化代码
     sncState_t *bufState = (sncState_t *)buf;
-    // 将SNC的块结构指向初始向量，用于提高性能和简化代码
     sncState_t *ivState = (sncState_t *)ctx->iv;
-    // 因为是直接使用块分组进行操作，所以需要将长度除以块的长度
     size /= SNC_BLOCKLEN;
 
     for(r = 0; r < SNC_NR; ++r) {
-        // 每轮使用对应的子密钥进行一次数据的整体加密
         for(i = 0; i < size; ++i) {
-            // 将输入块与初始向量进行一次异或
             SNC_XorWithIV((bufState + i), ivState);
-            // 加密此块
             SNC_Cipher((bufState + i), (sncState_t *)ctx->rk[r]);
-            // 将初始向量块的指针指向被加密的这个块用于下一个块的加密
             ivState = (bufState + i);
         }
     }
 }
 
-// CBC模式解密
-// 我干你妈，解密不了啊
+// CBC模式解密 我干你妈，解密不了啊
+// 修复你妈的BUG，操，老子去睡觉了，滚你妈的
 snVoid SNC_CBC_Decrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
 {
     register snSize_t r;
     register snSize_t i;
 
-    // 将SNC的块结构指向输入的数据，用于提高性能和简化代码
     sncState_t *bufState = (sncState_t *)buf;
-    // 将SNC的块结构指向空指针，用于一会指向密文块与提高性能和简化代码
-    sncState_t *ivState = snNull;
-    // 因为是直接使用块分组进行操作，所以需要将长度除以块的长度
+    sncState_t *ivState = (sncState_t *)ctx->iv;
     size /= SNC_BLOCKLEN;
 
     for(r = 0; r < SNC_NR; ++r) {
-        // 每轮使用对应的子密钥进行一次数据的整体解密
         for(i = 0; i < size; ++i) {
-            // 将初始向量块的指针指向块用于解密
-            ivState = (bufState + i);
-            // 解密此块
-            SNC_InvCipher((bufState + i), (sncState_t *)ctx->rk[SNC_NR - r - 1]);
-            // 将输入块与初始向量进行一次异或
+            // SNC_InvCipher((bufState + i), (sncState_t *)ctx->rk[SNC_NR - r - 1]);
+            SNC_InvCipher((bufState + i), (sncState_t *)ctx->rk[r]);
             SNC_XorWithIV((bufState + i), ivState);
+            ivState = bufState + i;
         }
     }
 }

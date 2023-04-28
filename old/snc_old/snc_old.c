@@ -45,7 +45,7 @@ static const snByte SNC_RSBOX[256] = {
 * Private Function                                           *
 *************************************************************/
 // 字节置换
-static snVoid SNC_SubBytes(sncState_t *state)
+SN_STATIC_FUNC(snVoid) SNC_SubBytes(sncState_t *state)
 {
     register sn_u32 i;
 
@@ -62,7 +62,7 @@ static snVoid SNC_SubBytes(sncState_t *state)
 }
 
 // 逆字节置换
-static snVoid SNC_InvSubBytes(sncState_t *state)
+SN_STATIC_FUNC(snVoid) SNC_InvSubBytes(sncState_t *state)
 {
     register sn_u32 i;
 
@@ -79,7 +79,7 @@ static snVoid SNC_InvSubBytes(sncState_t *state)
 }
 
 // 行混合
-static snVoid SNC_RowsMix(sncState_t *state)
+SN_STATIC_FUNC(snVoid) SNC_RowsMix(sncState_t *state)
 {
     register sn_u32 i;
 
@@ -96,7 +96,7 @@ static snVoid SNC_RowsMix(sncState_t *state)
 }
 
 // 逆行混合
-static snVoid SNC_InvRowsMix(sncState_t *state)
+SN_STATIC_FUNC(snVoid) SNC_InvRowsMix(sncState_t *state)
 {
     register sn_u32 i;
 
@@ -113,7 +113,7 @@ static snVoid SNC_InvRowsMix(sncState_t *state)
 }
 
 // 列移位
-static snVoid SNC_ColumnShift(sncState_t *state)
+SN_STATIC_FUNC(snVoid) SNC_ColumnShift(sncState_t *state)
 {
     snByte buf;
 
@@ -174,7 +174,7 @@ static snVoid SNC_ColumnShift(sncState_t *state)
 }
 
 // 逆列移位
-static snVoid SNC_InvColumnShift(sncState_t *state)
+SN_STATIC_FUNC(snVoid) SNC_InvColumnShift(sncState_t *state)
 {
     static snByte buf;
 
@@ -234,7 +234,7 @@ static snVoid SNC_InvColumnShift(sncState_t *state)
 }
 
 // 加密块
-static snVoid SNC_Cipher(sncState_t *state, sncState_t *RoundKey)
+SN_STATIC_FUNC(snVoid) SNC_Cipher(sncState_t *state, sncState_t *RoundKey)
 {
     register sn_u32 i;
 
@@ -255,7 +255,7 @@ static snVoid SNC_Cipher(sncState_t *state, sncState_t *RoundKey)
 }
 
 // 解密块
-static snVoid SNC_InvCipher(sncState_t *state, sncState_t *RoundKey)
+SN_STATIC_FUNC(snVoid) SNC_InvCipher(sncState_t *state, sncState_t *RoundKey)
 {
     register sn_u32 i;
 
@@ -275,7 +275,7 @@ static snVoid SNC_InvCipher(sncState_t *state, sncState_t *RoundKey)
     SNC_InvRowsMix(state);
 }
 
-static snVoid SNC_keyExtension(SNC_ctx *ctx, snByte *key)
+SN_STATIC_FUNC(snVoid) SNC_keyExtension(SNC_ctx *ctx, snByte *key)
 {
     register snByte i;
     register snByte buf;
@@ -342,12 +342,12 @@ snVoid SNC_init_ctx(SNC_ctx *ctx, const snByte *keyBuf)
     }
 }
 
-snVoid SNC_CBC_Encrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
+snVoid SNC_CBC_Encrypt(SNC_ctx *ctx, snByte *buf, snSize size)
 {
-    register snSize_t r;
-    register snSize_t i;
-    register snSize_t n;
-    static snSize_t addr;
+    register snSize r;
+    register snSize i;
+    register snSize n;
+    static snSize addr;
 
     size >>= SNC_BIT_SHIFT;
 
@@ -359,12 +359,12 @@ snVoid SNC_CBC_Encrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
     }
 }
 
-snVoid SNC_CBC_Decrypt(SNC_ctx *ctx, snByte *buf, snSize_t size)
+snVoid SNC_CBC_Decrypt(SNC_ctx *ctx, snByte *buf, snSize size)
 {
-    register snSize_t r;
-    register snSize_t i;
-    register snSize_t n;
-    static snSize_t addr;
+    register snSize r;
+    register snSize i;
+    register snSize n;
+    static snSize addr;
 
     size >>= SNC_BIT_SHIFT;
 

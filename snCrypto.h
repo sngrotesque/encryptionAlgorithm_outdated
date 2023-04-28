@@ -1,28 +1,22 @@
 #ifndef __SN_CRYPTO__ // snCrypto
 #define __SN_CRYPTO__
-#include <stdint.h>
 #include <snBits.h>
 #include <snRand.h>
 
-#define SBOX_BLOCKLEN 256
-
-static void sbox_init(uint8_t *sbox)
+static void snCrypto_sbox_init(snByte *sbox)
 {
-    setRandomSeed();
-    uint16_t r;
-    uint16_t x;
-    uint16_t left;
-    uint16_t right;
-    uint8_t swap;
+    snSetRandomTimerSeed(1934830);
+    static sn_u32 r, x, left, right;
+    static snByte swap;
 
-    for(x = 0; x < SBOX_BLOCKLEN; ++x)
+    for(x = 0; x < 256; ++x)
         sbox[x] = x;
 
     for(r = 0; r < 16; ++r) {
-        for(x = 0; x < SBOX_BLOCKLEN; ++x) {
+        for(x = 0; x < 256; ++x) {
             do {
-                left  = randint(0, SBOX_BLOCKLEN - 1);
-                right = randint(0, SBOX_BLOCKLEN - 1);
+                left  = randint(911, 0, 255);
+                right = randint(911, 0, 255);
             } while(left == right);
             swap = sbox[left];
             sbox[left] = sbox[right];
@@ -31,9 +25,9 @@ static void sbox_init(uint8_t *sbox)
     }
 }
 
-static void rsbox_init(uint8_t *sbox, uint8_t *rsbox)
+static void snCrypto_rsbox_init(snByte *sbox, snByte *rsbox)
 {
-    for(uint16_t x = 0; x < SBOX_BLOCKLEN; ++x)
+    for(sn_u32 x = 0; x < 256; ++x)
         rsbox[sbox[x]] = x;
 }
 

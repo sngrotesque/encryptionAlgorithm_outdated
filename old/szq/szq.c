@@ -41,7 +41,7 @@
 * 0xa4, 0x31, 0x2d, 0x00, 0xa2, 0xaf, 0xb7, 0xd4, 0xe7, 0x8d, 0xdc, 0x51, 0x2e, 0x55, 0x50, 0x38
 */
 
-// 此sbox与rsbox由"sbox_init"与"rsbox_init"两个函数生成
+// 此sbox与rsbox由"snCrypto_sbox_init"与"snCrypto_rsbox_init"两个函数生成
 #ifndef __SZQ_SBOX__ // szq SZQ_sbox
 static const uint8_t SZQ_sbox[256] = {
     // 0     1     2     3     4     5     6     7     8     9     A     B     C     D     E     F

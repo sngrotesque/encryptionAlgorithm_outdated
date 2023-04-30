@@ -1,6 +1,6 @@
 #include "snc_old.h"
 
-static const snByte SNC_SBOX[256] = {
+SN_PRIVATE_CONST(snByte) SNC_SBOX[256] = {
     0x25, 0xd1, 0x84, 0xb8, 0x48, 0x35, 0x4a, 0x78, 0x79, 0x74, 0x60, 0xc7, 0x0e, 0xbc, 0x32, 0x30,
     0x91, 0x18, 0xe5, 0xdc, 0xe4, 0x90, 0x81, 0xc8, 0x65, 0x2b, 0xc3, 0x9d, 0x67, 0xa5, 0xf9, 0xdf,
     0x13, 0xf6, 0x1b, 0xd4, 0xa9, 0xb7, 0xc2, 0x5a, 0x85, 0xac, 0x41, 0x8e, 0xeb, 0x72, 0xef, 0xad,
@@ -19,7 +19,7 @@ static const snByte SNC_SBOX[256] = {
     0x55, 0x70, 0xf3, 0x62, 0x92, 0x56, 0x6d, 0x15, 0x2a, 0x61, 0xcd, 0x99, 0x7c, 0xf1, 0xd7, 0x07
 };
 
-static const snByte SNC_RSBOX[256] = {
+SN_PRIVATE_CONST(snByte) SNC_RSBOX[256] = {
     0xee, 0x47, 0xbf, 0xb1, 0x3e, 0x91, 0x9f, 0xff, 0x94, 0xe4, 0x56, 0x6d, 0x92, 0x76, 0x0c, 0x98,
     0x82, 0x49, 0xef, 0x20, 0xe9, 0xf7, 0x37, 0x4c, 0x11, 0x81, 0xaf, 0x22, 0x4d, 0xa3, 0x45, 0x32,
     0x48, 0xc3, 0xd3, 0x7a, 0x96, 0x00, 0xd7, 0xdc, 0xc1, 0xa4, 0xf8, 0x19, 0xb6, 0xd8, 0x9d, 0x64,
@@ -45,7 +45,7 @@ static const snByte SNC_RSBOX[256] = {
 * Private Function                                           *
 *************************************************************/
 // 字节置换
-SN_STATIC_FUNC(snVoid) SNC_SubBytes(sncState_t *state)
+SN_PRIVATE(snVoid) SNC_SubBytes(sncState_t *state)
 {
     register sn_u32 i;
 
@@ -62,7 +62,7 @@ SN_STATIC_FUNC(snVoid) SNC_SubBytes(sncState_t *state)
 }
 
 // 逆字节置换
-SN_STATIC_FUNC(snVoid) SNC_InvSubBytes(sncState_t *state)
+SN_PRIVATE(snVoid) SNC_InvSubBytes(sncState_t *state)
 {
     register sn_u32 i;
 
@@ -79,7 +79,7 @@ SN_STATIC_FUNC(snVoid) SNC_InvSubBytes(sncState_t *state)
 }
 
 // 行混合
-SN_STATIC_FUNC(snVoid) SNC_RowsMix(sncState_t *state)
+SN_PRIVATE(snVoid) SNC_RowsMix(sncState_t *state)
 {
     register sn_u32 i;
 
@@ -96,7 +96,7 @@ SN_STATIC_FUNC(snVoid) SNC_RowsMix(sncState_t *state)
 }
 
 // 逆行混合
-SN_STATIC_FUNC(snVoid) SNC_InvRowsMix(sncState_t *state)
+SN_PRIVATE(snVoid) SNC_InvRowsMix(sncState_t *state)
 {
     register sn_u32 i;
 
@@ -113,7 +113,7 @@ SN_STATIC_FUNC(snVoid) SNC_InvRowsMix(sncState_t *state)
 }
 
 // 列移位
-SN_STATIC_FUNC(snVoid) SNC_ColumnShift(sncState_t *state)
+SN_PRIVATE(snVoid) SNC_ColumnShift(sncState_t *state)
 {
     snByte buf;
 
@@ -174,7 +174,7 @@ SN_STATIC_FUNC(snVoid) SNC_ColumnShift(sncState_t *state)
 }
 
 // 逆列移位
-SN_STATIC_FUNC(snVoid) SNC_InvColumnShift(sncState_t *state)
+SN_PRIVATE(snVoid) SNC_InvColumnShift(sncState_t *state)
 {
     static snByte buf;
 
@@ -234,7 +234,7 @@ SN_STATIC_FUNC(snVoid) SNC_InvColumnShift(sncState_t *state)
 }
 
 // 加密块
-SN_STATIC_FUNC(snVoid) SNC_Cipher(sncState_t *state, sncState_t *RoundKey)
+SN_PRIVATE(snVoid) SNC_Cipher(sncState_t *state, sncState_t *RoundKey)
 {
     register sn_u32 i;
 
@@ -255,7 +255,7 @@ SN_STATIC_FUNC(snVoid) SNC_Cipher(sncState_t *state, sncState_t *RoundKey)
 }
 
 // 解密块
-SN_STATIC_FUNC(snVoid) SNC_InvCipher(sncState_t *state, sncState_t *RoundKey)
+SN_PRIVATE(snVoid) SNC_InvCipher(sncState_t *state, sncState_t *RoundKey)
 {
     register sn_u32 i;
 
@@ -275,7 +275,7 @@ SN_STATIC_FUNC(snVoid) SNC_InvCipher(sncState_t *state, sncState_t *RoundKey)
     SNC_InvRowsMix(state);
 }
 
-SN_STATIC_FUNC(snVoid) SNC_keyExtension(SNC_ctx *ctx, snByte *key)
+SN_PRIVATE(snVoid) SNC_keyExtension(SNC_ctx *ctx, snByte *key)
 {
     register snByte i;
     register snByte buf;

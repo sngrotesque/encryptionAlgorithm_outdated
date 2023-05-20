@@ -1,8 +1,15 @@
 # 请不要使用这里面的加密算法，不是绝对安全的并且性能也比较差
+# Please do not use the encryption algorithms provided by this warehouse as they are not absolutely secure and have poor performance
 # 请不要使用这里面的加密算法，不是绝对安全的并且性能也比较差
+# Please do not use the encryption algorithms provided by this warehouse as they are not absolutely secure and have poor performance
 # 请不要使用这里面的加密算法，不是绝对安全的并且性能也比较差
+# Please do not use the encryption algorithms provided by this warehouse as they are not absolutely secure and have poor performance
 # 请不要使用这里面的加密算法，不是绝对安全的并且性能也比较差
+# Please do not use the encryption algorithms provided by this warehouse as they are not absolutely secure and have poor performance
 # 请不要使用这里面的加密算法，不是绝对安全的并且性能也比较差
+# Please do not use the encryption algorithms provided by this warehouse as they are not absolutely secure and have poor performance
+# 请不要使用这里面的加密算法，不是绝对安全的并且性能也比较差
+# Please do not use the encryption algorithms provided by this warehouse as they are not absolutely secure and have poor performance
 
 ### SNC cipher
 ```text
